@@ -8,8 +8,24 @@ import { registerIpcHandlers } from './ipc/handlers';
 let mainWindow: BrowserWindow;
 
 function getAppVersion(): string {
-  // Use Electron's built-in method which reads from package.json reliably
-  return app.getVersion();
+  // app.getVersion() returns Electron version, not app version
+  // Use direct package.json reading to get actual app version
+  try {
+    const packagePath = path.join(process.resourcesPath || __dirname, '../../../package.json');
+    const packageContent = fs.readFileSync(packagePath, 'utf-8');
+    const packageJson = JSON.parse(packageContent);
+    return packageJson.version;
+  } catch (error) {
+    // Fallback for development - try relative path
+    try {
+      const devPackagePath = path.join(__dirname, '../../../../package.json');
+      const packageContent = fs.readFileSync(devPackagePath, 'utf-8');
+      const packageJson = JSON.parse(packageContent);
+      return packageJson.version;
+    } catch (devError) {
+      return '1.3'; // Ultimate fallback
+    }
+  }
 }
 
 function getChangelog(): string {
