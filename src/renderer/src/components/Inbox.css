@@ -1,0 +1,171 @@
+.inbox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.inbox.loading {
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.inbox-header {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+}
+
+.inbox-header h2 {
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.filter-buttons button {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e0;
+  background: white;
+  color: #4a5568;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.filter-buttons button:hover {
+  background: #f7fafc;
+}
+
+.filter-buttons button.active {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.artifact-list {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #718096;
+}
+
+.empty-state p {
+  margin: 0 0 5px 0;
+  font-weight: 500;
+}
+
+.empty-state span {
+  font-size: 0.9rem;
+}
+
+.artifact-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.artifact-item:hover {
+  background: #f8f9fa;
+}
+
+.artifact-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+  margin-top: 2px;
+}
+
+.artifact-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.artifact-title {
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+
+.artifact-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.artifact-date {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.recommendation {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.recommendation.read {
+  background: #d4edda;
+  color: #155724;
+}
+
+.recommendation.discard {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.recommendation.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.artifact-reasoning {
+  font-size: 0.85rem;
+  color: #4a5568;
+  line-height: 1.3;
+}
+
+.delete-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: #e53e3e;
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.artifact-item:hover .delete-button {
+  opacity: 1;
+}
+
+.delete-button:hover {
+  background: #c53030;
+}

@@ -1,0 +1,29 @@
+.header {
+  height: 60px;
+  background: #2c3e50;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid #34495e;
+}
+
+.header h1 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.config-button {
+  background: #3498db;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.config-button:hover {
+  background: #2980b9;
+}
