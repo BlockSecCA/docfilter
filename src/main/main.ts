@@ -29,7 +29,7 @@ function createMenu(): void {
           label: 'User Guide',
           click: async () => {
             // Open HELP.md file with system default application
-            const helpPath = path.join(__dirname, '../../../HELP.md');
+            const helpPath = path.join(__dirname, '../../../../HELP.md');
             shell.openPath(helpPath);
           }
         },
