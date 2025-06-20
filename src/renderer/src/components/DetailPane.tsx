@@ -15,9 +15,10 @@ interface Artifact {
 
 interface DetailPaneProps {
   artifact: Artifact | null;
+  onArtifactUpdated?: () => void;
 }
 
-function DetailPane({ artifact }: DetailPaneProps) {
+function DetailPane({ artifact, onArtifactUpdated }: DetailPaneProps) {
   if (!artifact) {
     return (
       <div className="detail-pane empty">
@@ -48,7 +49,7 @@ function DetailPane({ artifact }: DetailPaneProps) {
   const handleReprocess = async () => {
     try {
       await window.electronAPI.reprocessArtifact(artifact.id);
-      // Note: In a real app, you'd want to refresh the data here
+      onArtifactUpdated?.();
     } catch (error) {
       console.error('Error reprocessing artifact:', error);
     }

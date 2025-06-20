@@ -33,6 +33,13 @@ function getChangelog(): string {
   // This ensures it's always available regardless of packaging
   const changelogContent = `# Changelog
 
+## [1.4] - 2025-06-20
+
+### Fixed
+- Reprocess button now immediately refreshes UI after reprocessing artifacts
+- Users can see updated AI recommendations and reasoning without manual refresh
+- Improved user experience for artifact reprocessing workflow
+
 ## [1.3] - 2025-06-20
 
 ### Added
