@@ -70,7 +70,6 @@ function createMenu(): void {
                     }
                     .badge.read { background: #d4edda; color: #155724; }
                     .badge.discard { background: #f8d7da; color: #721c24; }
-                    .badge.pending { background: #fff3cd; color: #856404; }
                     hr { border: none; border-top: 1px solid #e0e0e0; margin: 30px 0; }
                   </style>
                 </head>
@@ -119,7 +118,6 @@ function createMenu(): void {
                   <ul>
                     <li><span class="badge read">READ</span> badge: AI recommends this content is valuable</li>
                     <li><span class="badge discard">DISCARD</span> badge: AI suggests skipping this content</li>
-                    <li><span class="badge pending">PENDING</span> badge: Still being processed</li>
                   </ul>
                   
                   <p>Click any item to see:</p>
