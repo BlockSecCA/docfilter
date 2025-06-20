@@ -1,10 +1,94 @@
 import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import { isDev } from './utils/env';
 import { initDatabase } from './database/init';
 import { registerIpcHandlers } from './ipc/handlers';
 
 let mainWindow: BrowserWindow;
+
+function getAppVersion(): string {
+  // Use Electron's built-in method which reads from package.json reliably
+  return app.getVersion();
+}
+
+function getChangelog(): string {
+  // For compiled apps, embed changelog directly instead of reading from file
+  // This ensures it's always available regardless of packaging
+  const changelogContent = `# Changelog
+
+## [1.3] - 2025-06-20
+
+### Added
+- Dynamic version display reading from package.json
+- Complete changelog with release notes in About dialog
+- Internal read-only help system replacing external file dependency
+- Custom menu system with streamlined View and Help menus  
+- User Guide modal window with professional formatting
+
+### Changed
+- About dialog now shows current version and full release history
+- Help documentation accurately reflects app behavior (READ/DISCARD only)
+- Removed File, Edit, and Window menus to reduce clutter
+- Help content is now self-contained and cannot be accidentally edited
+
+### Fixed
+- Version display now updates automatically with package.json
+- Help menu path resolution issues resolved
+- Incorrect PENDING state documentation removed
+
+## [1.2] - 2025-06-20
+
+### Added
+- Resizable inbox and detail panels with drag handle
+- Panel width preferences saved to localStorage
+- Smooth resize interactions with visual feedback
+
+### Changed
+- Improved UI layout with adjustable panel sizing
+- Enhanced user experience with persistent panel preferences
+
+## [1.1] - 2025-06-20
+
+### Added
+- Time-based sorting for inbox items (Newest/Oldest first)
+- Sort controls in inbox header
+- Improved artifact management workflow
+
+### Changed
+- Enhanced inbox functionality with better organization options
+
+## [1.0] - 2025-06-20
+
+### Added
+- Initial release of AI Triage Assistant
+- Multi-format content support (PDF, DOCX, TXT, URLs, YouTube)
+- AI analysis with OpenAI, Anthropic, and local LLM providers
+- Local SQLite storage for all data
+- Drag & drop file interface
+- Configurable system prompts and AI providers
+- Inbox with filtering (All/Read/Discard)
+- Detailed artifact view with AI reasoning
+- About dialog and basic help system`;
+
+  // Convert markdown to basic HTML for display
+  const htmlContent = changelogContent
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^\* (.+)$/gm, '<li>$1</li>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[h|l|p])/gm, '<p>')
+    .replace(/(?<!>)$/gm, '</p>')
+    .replace(/<p><\/p>/g, '')
+    .replace(/<p>(<h[1-6])/g, '$1')
+    .replace(/(<\/h[1-6]>)<\/p>/g, '$1')
+    .replace(/<p>(<li)/g, '<ul>$1')
+    .replace(/(<\/li>)<\/p>/g, '$1</ul>');
+  
+  return htmlContent;
+}
 
 function createMenu(): void {
   const template: Electron.MenuItemConstructorOptions[] = [
@@ -183,31 +267,122 @@ function createMenu(): void {
         {
           label: 'About AI Triage Assistant',
           click: () => {
+            const version = getAppVersion();
+            const changelog = getChangelog();
+            
             const aboutWindow = new BrowserWindow({
-              width: 400,
-              height: 300,
+              width: 700,
+              height: 600,
               modal: true,
               parent: mainWindow,
               webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true
-              }
+              },
+              autoHideMenuBar: true
             });
             
-            aboutWindow.loadURL(`data:text/html,
+            const aboutContent = `
+              <!DOCTYPE html>
               <html>
-                <head><title>About</title></head>
-                <body style="font-family: system-ui; padding: 40px; text-align: center;">
-                  <h2>AI Triage Assistant</h2>
-                  <p>Desktop application for triaging documents, URLs, and multimedia using AI analysis.</p>
-                  <p>Version 1.0.0</p>
-                  <p style="margin-top: 30px; font-size: 12px; color: #666;">
-                    Built with Electron, React, and TypeScript
-                  </p>
+                <head>
+                  <title>About AI Triage Assistant</title>
+                  <style>
+                    body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+                      line-height: 1.6;
+                      max-width: 700px;
+                      margin: 0 auto;
+                      padding: 20px;
+                      color: #333;
+                      background: white;
+                    }
+                    .header {
+                      text-align: center;
+                      border-bottom: 2px solid #3498db;
+                      padding-bottom: 20px;
+                      margin-bottom: 30px;
+                    }
+                    .header h1 { 
+                      color: #2c3e50; 
+                      margin-bottom: 10px; 
+                    }
+                    .version {
+                      font-size: 1.2em;
+                      font-weight: bold;
+                      color: #3498db;
+                      margin: 10px 0;
+                    }
+                    .description {
+                      color: #666;
+                      font-style: italic;
+                      margin-bottom: 10px;
+                    }
+                    .tech-stack {
+                      font-size: 0.9em;
+                      color: #888;
+                    }
+                    .changelog {
+                      margin-top: 30px;
+                      max-height: 350px;
+                      overflow-y: auto;
+                      border: 1px solid #e0e0e0;
+                      border-radius: 5px;
+                      padding: 15px;
+                      background: #f9f9f9;
+                    }
+                    .changelog h1 { 
+                      color: #2c3e50; 
+                      font-size: 1.3em;
+                      margin-bottom: 20px;
+                      border-bottom: 1px solid #3498db;
+                      padding-bottom: 5px;
+                    }
+                    .changelog h2 { 
+                      color: #34495e; 
+                      font-size: 1.1em;
+                      margin-top: 25px;
+                      margin-bottom: 10px;
+                    }
+                    .changelog h3 { 
+                      color: #555; 
+                      font-size: 1em;
+                      margin-top: 15px;
+                      margin-bottom: 5px;
+                    }
+                    .changelog ul { 
+                      margin: 5px 0 15px 20px; 
+                      padding: 0;
+                    }
+                    .changelog li { 
+                      margin: 3px 0; 
+                      list-style-type: disc;
+                    }
+                    .changelog p {
+                      margin: 10px 0;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="header">
+                    <h1>AI Triage Assistant</h1>
+                    <div class="version">Version ${version}</div>
+                    <div class="description">
+                      Desktop application for triaging documents, URLs, and multimedia using AI analysis.
+                    </div>
+                    <div class="tech-stack">
+                      Built with Electron, React, and TypeScript
+                    </div>
+                  </div>
+                  
+                  <div class="changelog">
+                    ${changelog}
+                  </div>
                 </body>
               </html>
-            `);
+            `;
             
+            aboutWindow.loadURL(`data:text/html,${encodeURIComponent(aboutContent)}`);
             aboutWindow.setMenuBarVisibility(false);
           }
         }
