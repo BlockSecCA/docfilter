@@ -183,10 +183,37 @@ Then configure the endpoint as `http://localhost:11434/api/generate` in the app.
 
 ## Building for Production
 
+### Development Build
 ```bash
 npm run build
 npx electron dist/main/src/main/main.js
 ```
+
+### Package as Executable
+
+#### Prerequisites
+```cmd
+npm install --save-dev electron-builder
+```
+
+#### Create Windows Installer (.exe)
+```cmd
+npm run dist:win
+```
+Creates an NSIS installer in the `release/` folder.
+
+#### Package for All Platforms
+```cmd
+npm run dist
+```
+
+#### Package Without Installer (Portable)
+```cmd
+npm run pack
+```
+Creates a portable folder with the executable.
+
+**Note**: Add application icons to `assets/icon.ico` (Windows), `assets/icon.icns` (Mac), and `assets/icon.png` (Linux) for proper branding.
 
 ## Data Storage
 

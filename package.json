@@ -1,7 +1,7 @@
 {
   "name": "reading_agent",
   "version": "1.0.0",
-  "main": "dist/main/main.js",
+  "main": "dist/main/src/main/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:main\"",
     "dev:renderer": "vite --host",
@@ -10,7 +10,10 @@
     "build:main": "tsc -p tsconfig.node.json",
     "build:renderer": "vite build",
     "start": "electron dist/main/main.js",
-    "start-headless": "xvfb-run -a electron dist/main/main.js"
+    "start-headless": "xvfb-run -a electron dist/main/main.js",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "pack": "electron-builder --dir"
   },
   "keywords": [],
   "author": "",
@@ -39,5 +42,40 @@
     "react-dom": "^19.1.0",
     "sqlite3": "^5.1.7",
     "uuid": "^11.1.0"
+  },
+  "build": {
+    "appId": "com.blocksec.ai-triage-assistant",
+    "productName": "AI Triage Assistant",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
   }
 }
