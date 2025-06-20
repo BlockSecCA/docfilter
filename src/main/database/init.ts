@@ -27,8 +27,8 @@ export async function initDatabase(): Promise<void> {
             ai_reasoning TEXT,
             provider TEXT,
             model TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT (datetime('now', 'localtime')),
+            updated_at DATETIME DEFAULT (datetime('now', 'localtime'))
           )
         `);
 
@@ -37,7 +37,7 @@ export async function initDatabase(): Promise<void> {
           CREATE TABLE IF NOT EXISTS config (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            updated_at DATETIME DEFAULT (datetime('now', 'localtime'))
           )
         `);
 

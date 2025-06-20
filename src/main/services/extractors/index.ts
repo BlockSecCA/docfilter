@@ -10,10 +10,42 @@ export interface ExtractionResult {
 export async function extractContent(type: string, source: string, data?: string | Buffer): Promise<string> {
   switch (type) {
     case 'file':
-      if (!data || typeof data === 'string') {
+      if (!data) {
         throw new Error('File data is required for file extraction');
       }
-      return await extractFileContent(source, data as Buffer);
+      
+      if (typeof data === 'string' && data.length === 0) {
+        throw new Error('File data is empty');
+      }
+      
+      let buffer: Buffer;
+      if (typeof data === 'string') {
+        // Check if it's base64 encoded (for binary files from frontend)
+        try {
+          // Validate base64 format
+          if (/^[A-Za-z0-9+/]*={0,2}$/.test(data)) {
+            buffer = Buffer.from(data, 'base64');
+            console.log(`Decoded base64 data: ${buffer.length} bytes for ${source}`);
+          } else {
+            // Treat as plain text
+            buffer = Buffer.from(data, 'utf-8');
+            console.log(`Using text data: ${buffer.length} bytes for ${source}`);
+          }
+        } catch (error) {
+          console.error('Base64 decode error:', error);
+          // If decode fails, treat as regular text
+          buffer = Buffer.from(data, 'utf-8');
+        }
+      } else {
+        buffer = data as Buffer;
+        console.log(`Using buffer data: ${buffer.length} bytes for ${source}`);
+      }
+      
+      if (buffer.length === 0) {
+        throw new Error('File buffer is empty after processing');
+      }
+      
+      return await extractFileContent(source, buffer);
     
     case 'url':
       if (source.includes('youtube.com') || source.includes('youtu.be')) {

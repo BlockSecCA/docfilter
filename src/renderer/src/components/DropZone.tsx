@@ -42,7 +42,25 @@ function DropZone({ onArtifactProcessed }: DropZoneProps) {
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const content = e.target?.result as string;
+        const result = e.target?.result;
+        let content: string;
+        
+        if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+          content = result as string;
+        } else {
+          // For binary files (PDF, DOCX), convert ArrayBuffer to base64 safely
+          const arrayBuffer = result as ArrayBuffer;
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = '';
+          const chunkSize = 0x8000; // 32KB chunks to avoid stack overflow
+          
+          for (let i = 0; i < bytes.length; i += chunkSize) {
+            const chunk = bytes.subarray(i, i + chunkSize);
+            binary += String.fromCharCode.apply(null, Array.from(chunk));
+          }
+          content = btoa(binary);
+        }
+        
         await window.electronAPI.processArtifact({
           type: 'file',
           content: content,
@@ -51,7 +69,7 @@ function DropZone({ onArtifactProcessed }: DropZoneProps) {
         onArtifactProcessed();
       };
       
-      if (file.type.startsWith('text/') || file.name.endsWith('.txt')) {
+      if (file.type.startsWith('text/') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
         reader.readAsText(file);
       } else {
         reader.readAsArrayBuffer(file);
