@@ -233,6 +233,7 @@ function createMenu(): void {
                     <li>AI's reasoning for the recommendation</li>
                     <li>When it was processed</li>
                     <li>Which AI model was used</li>
+                    <li><strong>Open Original</strong> button (for URLs) to view the source webpage</li>
                   </ul>
                   
                   <h3>4. Manage Your Content</h3>
