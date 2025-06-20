@@ -22,6 +22,7 @@ function Inbox({ onArtifactSelect, refreshTrigger }: InboxProps) {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
   useEffect(() => {
     loadArtifacts();
@@ -38,12 +39,23 @@ function Inbox({ onArtifactSelect, refreshTrigger }: InboxProps) {
     }
   };
 
-  const filteredArtifacts = artifacts.filter(artifact => {
-    if (filter === 'all') return true;
-    if (filter === 'read') return artifact.ai_recommendation?.toLowerCase() === 'read';
-    if (filter === 'discard') return artifact.ai_recommendation?.toLowerCase() === 'discard';
-    return true;
-  });
+  const filteredAndSortedArtifacts = artifacts
+    .filter(artifact => {
+      if (filter === 'all') return true;
+      if (filter === 'read') return artifact.ai_recommendation?.toLowerCase() === 'read';
+      if (filter === 'discard') return artifact.ai_recommendation?.toLowerCase() === 'discard';
+      return true;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      
+      if (sortOrder === 'newest') {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
+    });
 
   const handleDelete = async (e: React.MouseEvent, artifactId: string) => {
     e.stopPropagation();
@@ -89,37 +101,51 @@ function Inbox({ onArtifactSelect, refreshTrigger }: InboxProps) {
   return (
     <div className="inbox">
       <div className="inbox-header">
-        <h2>Inbox ({filteredArtifacts.length})</h2>
-        <div className="filter-buttons">
-          <button 
-            className={filter === 'all' ? 'active' : ''} 
-            onClick={() => setFilter('all')}
-          >
-            All
-          </button>
-          <button 
-            className={filter === 'read' ? 'active' : ''} 
-            onClick={() => setFilter('read')}
-          >
-            Read
-          </button>
-          <button 
-            className={filter === 'discard' ? 'active' : ''} 
-            onClick={() => setFilter('discard')}
-          >
-            Discard
-          </button>
+        <h2>Inbox ({filteredAndSortedArtifacts.length})</h2>
+        <div className="controls">
+          <div className="filter-buttons">
+            <button 
+              className={filter === 'all' ? 'active' : ''} 
+              onClick={() => setFilter('all')}
+            >
+              All
+            </button>
+            <button 
+              className={filter === 'read' ? 'active' : ''} 
+              onClick={() => setFilter('read')}
+            >
+              Read
+            </button>
+            <button 
+              className={filter === 'discard' ? 'active' : ''} 
+              onClick={() => setFilter('discard')}
+            >
+              Discard
+            </button>
+          </div>
+          <div className="sort-controls">
+            <label htmlFor="sort-select">Sort:</label>
+            <select 
+              id="sort-select"
+              value={sortOrder} 
+              onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
+              className="sort-select"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div className="artifact-list">
-        {filteredArtifacts.length === 0 ? (
+        {filteredAndSortedArtifacts.length === 0 ? (
           <div className="empty-state">
             <p>No artifacts yet</p>
             <span>Drop files or add URLs to get started</span>
           </div>
         ) : (
-          filteredArtifacts.map(artifact => (
+          filteredAndSortedArtifacts.map(artifact => (
             <div
               key={artifact.id}
               className="artifact-item"
