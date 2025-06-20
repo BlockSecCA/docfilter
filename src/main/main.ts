@@ -191,7 +191,7 @@ function createMenu(): void {
                   <h3>1. Configure the AI</h3>
                   <p>Before using the app, you need to set up an AI provider:</p>
                   <ol>
-                    <li>Click the <strong>Config</strong> button (⚙️) in the top-right corner</li>
+                    <li>Click the <strong>Config</strong> button in the top-right corner</li>
                     <li>Write instructions for the AI in the <strong>System Prompt</strong> box (e.g., "You are helping me decide what content is worth reading. Focus on business and technology topics.")</li>
                     <li>Choose and configure at least one AI provider:
                       <ul>
@@ -239,8 +239,8 @@ function createMenu(): void {
                   <h3>4. Manage Your Content</h3>
                   <p><strong>Filter Items:</strong> Click <strong>All</strong>, <strong>Read</strong>, or <strong>Discard</strong> buttons to filter your inbox</p>
                   <p><strong>Sort Items:</strong> Use the dropdown to sort by <strong>Newest First</strong> or <strong>Oldest First</strong></p>
-                  <p><strong>Delete Items:</strong> Hover over any item and click the <strong>×</strong> button to remove it</p>
-                  <p><strong>Reprocess Items:</strong> Click the <strong>🔄</strong> button to analyze an item again (useful after changing your system prompt or AI provider)</p>
+                  <p><strong>Delete Items:</strong> Hover over any item and click the <strong>&times;</strong> button to remove it</p>
+                  <p><strong>Reprocess Items:</strong> Click the <strong>Reprocess</strong> button to analyze an item again (useful after changing your system prompt or AI provider)</p>
                   
                   <h2>Tips for Better Results</h2>
                   <p><strong>Write Clear Instructions:</strong> Your system prompt should clearly describe what you're looking for. Examples:</p>
