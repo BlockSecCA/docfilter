@@ -104,7 +104,10 @@ function App() {
           className="right-panel"
           style={{ width: `calc(100% - ${leftPanelWidth}px - 4px)` }}
         >
-          <DetailPane artifact={selectedArtifact} />
+          <DetailPane 
+            artifact={selectedArtifact} 
+            onArtifactUpdated={handleArtifactProcessed}
+          />
         </div>
       </div>
 
