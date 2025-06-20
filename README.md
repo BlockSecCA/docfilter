@@ -5,7 +5,7 @@ A desktop application for triaging and classifying documents, URLs, and multimed
 ## Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph "Frontend (React)"
         UI[User Interface]
         DZ[DropZone Component]
