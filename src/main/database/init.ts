@@ -1,12 +1,24 @@
 import Database from 'sqlite3';
 import * as path from 'path';
+import * as fs from 'fs';
 import { app } from 'electron';
 
 let db: Database.Database;
 
 export async function initDatabase(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const dbPath = path.join(app.getPath('userData'), 'triage.db');
+    const userDataPath = app.getPath('userData');
+    const dbPath = path.join(userDataPath, 'triage.db');
+    
+    // Ensure user data directory exists before creating database
+    try {
+      if (!fs.existsSync(userDataPath)) {
+        fs.mkdirSync(userDataPath, { recursive: true });
+      }
+    } catch (error: any) {
+      reject(new Error(`Failed to create user data directory: ${error.message}`));
+      return;
+    }
     
     db = new Database.Database(dbPath, (err) => {
       if (err) {

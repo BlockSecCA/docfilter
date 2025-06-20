@@ -33,6 +33,13 @@ function getChangelog(): string {
   // This ensures it's always available regardless of packaging
   const changelogContent = `# Changelog
 
+## [1.4.1] - 2025-06-20
+
+### Fixed
+- First-run database initialization issue preventing config saving on fresh installations
+- User data directory creation before SQLite database initialization
+- Improved first-run user experience with reliable settings persistence
+
 ## [1.4] - 2025-06-20
 
 ### Fixed
