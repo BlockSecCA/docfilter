@@ -2,6 +2,93 @@
 
 A desktop application for triaging and classifying documents, URLs, and multimedia using local or remote LLMs.
 
+## Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend (React)"
+        UI[User Interface]
+        DZ[DropZone Component]
+        IB[Inbox Component]
+        DP[DetailPane Component]
+        CM[ConfigModal Component]
+    end
+
+    subgraph "Electron Main Process"
+        MP[Main Process]
+        IPC[IPC Handlers]
+        DB[SQLite Database]
+    end
+
+    subgraph "Content Processing"
+        EXT[Content Extractors]
+        PDF[PDF Extractor]
+        DOCX[DOCX Extractor]
+        WEB[Web Scraper]
+        YT[YouTube Extractor]
+    end
+
+    subgraph "AI Analysis"
+        PROC[Processor Service]
+        OAI[OpenAI Provider]
+        ANT[Anthropic Provider]
+        LOCAL[Local LLM Provider]
+    end
+
+    subgraph "External"
+        FILES[PDF/DOCX Files]
+        URLS[Web URLs]
+        OPENAI[OpenAI API]
+        CLAUDE[Anthropic API]
+        OLLAMA[Local Ollama]
+    end
+
+    %% User interactions
+    FILES --> DZ
+    URLS --> DZ
+    
+    %% Frontend to Main
+    DZ --> IPC
+    IB --> IPC
+    DP --> IPC
+    CM --> IPC
+    
+    %% Main process coordination
+    IPC --> PROC
+    IPC --> DB
+    DB --> IB
+    
+    %% Content processing flow
+    PROC --> EXT
+    EXT --> PDF
+    EXT --> DOCX
+    EXT --> WEB
+    EXT --> YT
+    
+    %% AI analysis flow
+    PROC --> OAI
+    PROC --> ANT
+    PROC --> LOCAL
+    
+    %% External API calls
+    OAI --> OPENAI
+    ANT --> CLAUDE
+    LOCAL --> OLLAMA
+    WEB --> URLS
+    
+    %% Data flow back
+    PROC --> DB
+    DB --> DP
+
+    style UI fill:#e1f5fe
+    style DB fill:#f3e5f5
+    style PROC fill:#e8f5e8
+    style EXT fill:#fff3e0
+    style OAI fill:#ffebee
+    style ANT fill:#ffebee
+    style LOCAL fill:#ffebee
+```
+
 ## Features
 
 - **Multi-format Support**: PDF, DOCX, TXT, URLs, YouTube videos
