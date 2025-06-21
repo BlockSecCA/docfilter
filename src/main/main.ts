@@ -266,6 +266,12 @@ function createMenu(): void {
                     <li>Enter a YouTube URL to analyze the video's title and description</li>
                   </ul>
                   
+                  <p><strong>Send URLs from Browser:</strong></p>
+                  <ul>
+                    <li>Add the DocFilter bookmarklet to your browser for quick URL sending</li>
+                    <li>See the "Browser Integration" section below for setup instructions</li>
+                  </ul>
+                  
                   <h3>3. Review AI Recommendations</h3>
                   <p>After processing, each item appears in your <strong>Inbox</strong> with:</p>
                   <ul>
@@ -324,6 +330,70 @@ function createMenu(): void {
                   <p><strong>AI not responding:</strong> Check your API keys in the Config menu, verify your internet connection, and for local LLMs, ensure your server is running</p>
                   <p><strong>App won't start:</strong> Make sure you've run "npm run build" after any changes. On Linux/WSL2, additional graphics libraries may be needed.</p>
                   
+                  <h2>Browser Integration</h2>
+                  
+                  <h3>Setup Bookmarklet</h3>
+                  
+                  <p><strong>1. Add Bookmarklet to Browser:</strong></p>
+                  <ul>
+                    <li>Copy this JavaScript code:</li>
+                  </ul>
+                  <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; overflow-x: auto;">javascript:(function(){window.open('docfilter://process?url=' + encodeURIComponent(window.location.href));})();</pre>
+                  <ul>
+                    <li>Create a new bookmark in your browser</li>
+                    <li>Paste the code as the bookmark URL/location</li>
+                    <li>Name it "Send to DocFilter" or similar</li>
+                  </ul>
+                  
+                  <p><strong>2. Using the Bookmarklet:</strong></p>
+                  <ul>
+                    <li>Navigate to any webpage you want to analyze</li>
+                    <li>Click the "Send to DocFilter" bookmark</li>
+                    <li>Browser will prompt to open DocFilter (allow and optionally remember choice)</li>
+                    <li>DocFilter will automatically process the page</li>
+                  </ul>
+                  
+                  <h3>How It Works</h3>
+                  <ul>
+                    <li><strong>PDF URLs:</strong> Automatically downloads and processes PDF files (works great with arXiv papers)</li>
+                    <li><strong>Web Pages:</strong> Extracts main content from regular websites</li>
+                    <li><strong>URL Cleaning:</strong> Removes tracking parameters (utm_source, fbclid, etc.) automatically</li>
+                    <li><strong>Single Window:</strong> Opens existing DocFilter window if already running</li>
+                  </ul>
+                  
+                  <h3>Browser Compatibility</h3>
+                  <ul>
+                    <li><strong>Firefox:</strong> Full support, works with all page types</li>
+                    <li><strong>Chrome/Edge:</strong> Full support, works with all page types</li>
+                    <li><strong>Safari:</strong> Full support, works with all page types</li>
+                  </ul>
+                  
+                  <h3>Limitations</h3>
+                  <ul>
+                    <li>Won't work on browser internal pages (chrome://, about:, etc.)</li>
+                    <li>Local files (file://) are not supported - use drag and drop instead</li>
+                    <li>Some PDF viewers may show the viewer URL instead of the actual PDF URL</li>
+                  </ul>
+                  
+                  <h3>Troubleshooting</h3>
+                  <p><strong>"No application found" error:</strong></p>
+                  <ul>
+                    <li>Make sure DocFilter is installed and has been run at least once</li>
+                    <li>The protocol handler is registered automatically on first run</li>
+                  </ul>
+                  
+                  <p><strong>Browser doesn't prompt:</strong></p>
+                  <ul>
+                    <li>Check if your browser blocked the popup</li>
+                    <li>Try manually allowing popups for the current site</li>
+                  </ul>
+                  
+                  <p><strong>Wrong URL being sent:</strong></p>
+                  <ul>
+                    <li>Some sites use complex URL structures - the bookmarklet sends the current page URL</li>
+                    <li>For embedded PDFs, try right-clicking the PDF and copying its direct link instead</li>
+                  </ul>
+
                   <hr>
                   <p><em>Need more technical help? Check the README.md file in the project folder for developer documentation.</em></p>
                 </body>
