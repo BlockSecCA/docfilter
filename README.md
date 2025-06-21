@@ -1,4 +1,4 @@
-# <img src="assets/icon.png" alt="DocFilter Icon" width="64" height="64"> DocFilter
+# <img src="assets/icon.png" alt="DocFilter Icon" width="48" height="48" style="vertical-align: middle;"> DocFilter
 
 > **⚠️ DISCLAIMER: This software is provided "AS IS" without warranty of any kind. This is a personal project shared for educational purposes. Issues, pull requests, and support requests will not be processed or responded to. Use at your own risk.**
 
