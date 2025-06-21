@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, BrowserWindow } from 'electron';
 import { getDatabase } from '../database/init';
 import { processArtifact } from '../services/processor';
 import { v4 as uuidv4 } from 'uuid';
@@ -221,6 +221,11 @@ export function registerIpcHandlers(): void {
           if (err) {
             reject(err);
           } else {
+            // Send event to renderer to refresh UI
+            const mainWindow = BrowserWindow.getAllWindows()[0];
+            if (mainWindow) {
+              mainWindow.webContents.send('artifact-updated', id);
+            }
             resolve({ id, ...result });
           }
         }

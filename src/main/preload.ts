@@ -8,6 +8,8 @@ export interface ElectronAPI {
   updateConfig: (config: any) => Promise<void>;
   getConfig: () => Promise<any>;
   reprocessArtifact: (id: string) => Promise<any>;
+  onArtifactAdded: (callback: (artifactId: string) => void) => void;
+  onArtifactUpdated: (callback: (artifactId: string) => void) => void;
 }
 
 const electronAPI: ElectronAPI = {
@@ -18,6 +20,8 @@ const electronAPI: ElectronAPI = {
   updateConfig: (config) => ipcRenderer.invoke('update-config', config),
   getConfig: () => ipcRenderer.invoke('get-config'),
   reprocessArtifact: (id) => ipcRenderer.invoke('reprocess-artifact', id),
+  onArtifactAdded: (callback) => ipcRenderer.on('artifact-added', (event, artifactId) => callback(artifactId)),
+  onArtifactUpdated: (callback) => ipcRenderer.on('artifact-updated', (event, artifactId) => callback(artifactId)),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

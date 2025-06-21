@@ -2,6 +2,21 @@
 
 All notable changes to DocFilter will be documented in this file.
 
+## [1.7.0] - 2025-06-21
+
+### Added
+- Browser integration with custom protocol handler (`docfilter://`)
+- Bookmarklet for sending URLs from any browser to DocFilter
+- Automatic PDF download and processing from URLs ending in .pdf
+- URL tracking parameter cleaning (removes utm_source, fbclid, etc.)
+- Single instance management - protocol URLs route to existing window
+- Graceful error handling for invalid URLs and file:// protocol rejection
+
+### Enhanced
+- Seamless workflow for processing arXiv papers and web content from browsers
+- Comprehensive browser setup instructions in HELP.md
+- Cross-platform protocol handler registration (Windows, macOS, Linux)
+
 ## [1.6.0] - 2025-06-21
 
 ### Added

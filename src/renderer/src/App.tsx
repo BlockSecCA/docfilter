@@ -80,6 +80,29 @@ function App() {
     };
   }, [isResizing]);
 
+  // Listen for artifact events from main process
+  React.useEffect(() => {
+    const handleArtifactAdded = (artifactId: string) => {
+      console.log('Artifact added from browser integration:', artifactId);
+      setRefreshInbox(prev => prev + 1);
+    };
+
+    const handleArtifactUpdated = (artifactId: string) => {
+      console.log('Artifact updated:', artifactId);
+      setRefreshInbox(prev => prev + 1);
+      // If the updated artifact is currently selected, refresh the selection
+      if (selectedArtifact && selectedArtifact.id === artifactId) {
+        // Re-fetch the updated artifact
+        window.electronAPI.getArtifact(artifactId).then(updatedArtifact => {
+          setSelectedArtifact(updatedArtifact);
+        });
+      }
+    };
+
+    window.electronAPI.onArtifactAdded(handleArtifactAdded);
+    window.electronAPI.onArtifactUpdated(handleArtifactUpdated);
+  }, [selectedArtifact]);
+
   return (
     <div className="app">
       <Header onConfigClick={() => setShowConfig(true)} />

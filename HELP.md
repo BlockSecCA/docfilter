@@ -29,6 +29,10 @@ Before using the app, you need to set up an AI provider:
 **Add YouTube Videos:**
 - Enter a YouTube URL to analyze the video's title and description
 
+**Send URLs from Browser:**
+- Add the DocFilter bookmarklet to your browser for quick URL sending
+- See the "Browser Integration" section below for setup instructions
+
 ### 3. Review AI Recommendations
 
 After processing, each item appears in your **Inbox** with:
@@ -117,6 +121,58 @@ Your system prompt should clearly describe what you're looking for. Examples:
 **App won't start:**
 - Make sure you've run "npm run build" after any changes
 - On Linux/WSL2, additional graphics libraries may be needed
+
+## Browser Integration
+
+### Setup Bookmarklet
+
+1. **Add Bookmarklet to Browser:**
+   - Copy this JavaScript code:
+   ```javascript
+   javascript:(function(){window.open('docfilter://process?url=' + encodeURIComponent(window.location.href));})();
+   ```
+   - Create a new bookmark in your browser
+   - Paste the code as the bookmark URL/location
+   - Name it "Send to DocFilter" or similar
+
+2. **Using the Bookmarklet:**
+   - Navigate to any webpage you want to analyze
+   - Click the "Send to DocFilter" bookmark
+   - Browser will prompt to open DocFilter (allow and optionally remember choice)
+   - DocFilter will automatically process the page
+
+### How It Works
+
+- **PDF URLs**: Automatically downloads and processes PDF files (works great with arXiv papers)
+- **Web Pages**: Extracts main content from regular websites
+- **URL Cleaning**: Removes tracking parameters (utm_source, fbclid, etc.) automatically
+- **Single Window**: Opens existing DocFilter window if already running
+
+### Browser Compatibility
+
+- **Firefox**: Full support, works with all page types
+- **Chrome/Edge**: Full support, works with all page types
+- **Safari**: Full support, works with all page types
+
+### Limitations
+
+- Won't work on browser internal pages (chrome://, about:, etc.)
+- Local files (file://) are not supported - use drag and drop instead
+- Some PDF viewers may show the viewer URL instead of the actual PDF URL
+
+### Troubleshooting
+
+**"No application found" error:**
+- Make sure DocFilter is installed and has been run at least once
+- The protocol handler is registered automatically on first run
+
+**Browser doesn't prompt:**
+- Check if your browser blocked the popup
+- Try manually allowing popups for the current site
+
+**Wrong URL being sent:**
+- Some sites use complex URL structures - the bookmarklet sends the current page URL
+- For embedded PDFs, try right-clicking the PDF and copying its direct link instead
 
 ---
 

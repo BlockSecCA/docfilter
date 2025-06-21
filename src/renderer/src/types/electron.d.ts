@@ -6,6 +6,8 @@ interface ElectronAPI {
   updateConfig: (config: any) => Promise<void>;
   getConfig: () => Promise<any>;
   reprocessArtifact: (id: string) => Promise<any>;
+  onArtifactAdded: (callback: (artifactId: string) => void) => void;
+  onArtifactUpdated: (callback: (artifactId: string) => void) => void;
 }
 
 declare global {
