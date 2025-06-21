@@ -11,6 +11,8 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     
     steps:
       - name: Checkout code
@@ -43,5 +45,3 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
