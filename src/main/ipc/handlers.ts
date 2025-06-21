@@ -161,12 +161,54 @@ export function registerIpcHandlers(): void {
       throw new Error('Artifact not found');
     }
 
-    // Reprocess it
-    const result = await processArtifact({
-      type: artifact.type,
-      content: artifact.extracted_content || artifact.source,
-      source: artifact.source
+    // Reprocess: Skip extraction, directly analyze existing content
+    if (!artifact.extracted_content) {
+      throw new Error('No extracted content available for reprocessing');
+    }
+
+    // Get current configuration
+    const configRows: any[] = await new Promise((resolve, reject) => {
+      db.all('SELECT key, value FROM config', (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
     });
+    
+    const config: any = {};
+    configRows.forEach(row => {
+      if (row.key === 'providers') {
+        config[row.key] = JSON.parse(row.value);
+      } else {
+        config[row.key] = row.value;
+      }
+    });
+    
+    // Build LLM config
+    const provider = config.default_provider || 'openai';
+    const providers = config.providers || {};
+    const systemPrompt = config.system_prompt || 'Analyze this content and recommend "Read" or "Discard" with reasoning.';
+    
+    if (!providers[provider]) {
+      throw new Error(`No configuration found for provider: ${provider}`);
+    }
+    
+    const llmConfig = {
+      provider,
+      config: providers[provider]
+    };
+
+    // Directly call LLM with existing extracted content
+    const { callLLM } = await import('../services/llm');
+    const llmResult = await callLLM(systemPrompt, artifact.extracted_content, llmConfig);
+    
+    const result = {
+      extractedContent: artifact.extracted_content,
+      recommendation: llmResult.recommendation,
+      summary: llmResult.summary,
+      reasoning: llmResult.reasoning,
+      provider: llmResult.provider,
+      model: llmResult.model
+    };
 
     // Update the artifact
     return new Promise((resolve, reject) => {
