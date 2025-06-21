@@ -891,10 +891,12 @@ async function processUrlFromBrowser(url: string): Promise<void> {
 
 function handleProtocolUrl(protocolUrl: string): void {
   try {
+    console.log('=== PROTOCOL HANDLER START ===');
     console.log('Received protocol URL:', protocolUrl);
     
     // Parse the protocol URL: docfilter://process?url=...
     const url = new URL(protocolUrl);
+    console.log('Parsed URL hostname:', url.hostname);
     
     if (url.hostname !== 'process') {
       console.error('Unknown protocol command:', url.hostname);
@@ -902,19 +904,25 @@ function handleProtocolUrl(protocolUrl: string): void {
     }
     
     const targetUrl = url.searchParams.get('url');
+    console.log('Raw target URL from params:', targetUrl);
+    
     if (!targetUrl) {
       console.error('No URL parameter found in protocol URL');
       return;
     }
     
     const decodedUrl = decodeURIComponent(targetUrl);
-    console.log('Extracted target URL:', decodedUrl);
+    console.log('Decoded target URL:', decodedUrl);
     
     // Process the URL
-    processUrlFromBrowser(decodedUrl);
+    console.log('About to call processUrlFromBrowser...');
+    processUrlFromBrowser(decodedUrl).catch(error => {
+      console.error('processUrlFromBrowser failed:', error);
+    });
+    console.log('=== PROTOCOL HANDLER END ===');
     
   } catch (error: any) {
-    console.error('Error handling protocol URL:', error);
+    console.error('Error in handleProtocolUrl:', error);
   }
 }
 
