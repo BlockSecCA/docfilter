@@ -137,6 +137,18 @@
   color: #856404;
 }
 
+.summary h4 {
+  margin: 0 0 10px 0;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.summary p {
+  color: #2d3748;
+  line-height: 1.6;
+  margin: 0 0 15px 0;
+}
+
 .reasoning h4 {
   margin: 0 0 10px 0;
   color: #4a5568;

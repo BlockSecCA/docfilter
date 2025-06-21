@@ -1,6 +1,6 @@
 {
   "name": "reading_agent",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "main": "dist/main/src/main/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:main\"",

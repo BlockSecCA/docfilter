@@ -79,3 +79,6 @@ jspm_packages/
 
 # Claude settings
 .claude/
+
+# Custom sync scripts
+push.sh

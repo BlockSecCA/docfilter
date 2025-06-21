@@ -10,6 +10,8 @@ export async function initDatabase(): Promise<void> {
     const userDataPath = app.getPath('userData');
     const dbPath = path.join(userDataPath, 'triage.db');
     
+    console.log('Database will be created at:', dbPath);
+    
     // Ensure user data directory exists before creating database
     try {
       if (!fs.existsSync(userDataPath)) {
@@ -36,6 +38,7 @@ export async function initDatabase(): Promise<void> {
             source TEXT NOT NULL,
             extracted_content TEXT,
             ai_recommendation TEXT,
+            ai_summary TEXT,
             ai_reasoning TEXT,
             provider TEXT,
             model TEXT,
@@ -43,6 +46,16 @@ export async function initDatabase(): Promise<void> {
             updated_at DATETIME DEFAULT (datetime('now', 'localtime'))
           )
         `);
+
+        // Add ai_summary column to existing artifacts table if it doesn't exist
+        db.run(`
+          ALTER TABLE artifacts ADD COLUMN ai_summary TEXT
+        `, (err) => {
+          // Ignore error if column already exists
+          if (err && !err.message.includes('duplicate column name')) {
+            console.error('Error adding ai_summary column:', err);
+          }
+        });
 
         // Configuration table
         db.run(`

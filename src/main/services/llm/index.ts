@@ -4,6 +4,7 @@ import { callLocalLLM, LocalLLMConfig } from './local';
 
 export interface LLMResult {
   recommendation: string;
+  summary: string;
   reasoning: string;
   provider: string;
   model: string;
@@ -17,7 +18,7 @@ export interface LLMConfig {
 export async function callLLM(prompt: string, content: string, llmConfig: LLMConfig): Promise<LLMResult> {
   const { provider, config } = llmConfig;
   
-  let result: { recommendation: string; reasoning: string };
+  let result: { recommendation: string; summary: string; reasoning: string };
   let model = 'unknown';
   
   switch (provider) {

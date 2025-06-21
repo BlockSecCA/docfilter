@@ -13,14 +13,15 @@ export function registerIpcHandlers(): void {
       
       return new Promise((resolve, reject) => {
         db.run(
-          `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_reasoning, provider, model, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
+          `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_summary, ai_reasoning, provider, model, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
           [
             artifactId,
             data.type,
             data.source,
             result.extractedContent,
             result.recommendation,
+            result.summary,
             result.reasoning,
             result.provider,
             result.model
@@ -171,9 +172,9 @@ export function registerIpcHandlers(): void {
     return new Promise((resolve, reject) => {
       db.run(
         `UPDATE artifacts 
-         SET ai_recommendation = ?, ai_reasoning = ?, provider = ?, model = ?, updated_at = datetime('now', 'localtime')
+         SET ai_recommendation = ?, ai_summary = ?, ai_reasoning = ?, provider = ?, model = ?, updated_at = datetime('now', 'localtime')
          WHERE id = ?`,
-        [result.recommendation, result.reasoning, result.provider, result.model, id],
+        [result.recommendation, result.summary, result.reasoning, result.provider, result.model, id],
         function (err) {
           if (err) {
             reject(err);
