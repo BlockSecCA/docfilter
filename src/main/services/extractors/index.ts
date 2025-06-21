@@ -8,6 +8,8 @@ export interface ExtractionResult {
 }
 
 export async function extractContent(type: string, source: string, data?: string | Buffer): Promise<string> {
+  console.log('extractContent called with:', { type, source, dataType: typeof data, dataLength: data ? (data instanceof Buffer ? data.length : data.length) : 0 });
+  
   switch (type) {
     case 'file':
       if (!data) {
@@ -45,7 +47,11 @@ export async function extractContent(type: string, source: string, data?: string
         throw new Error('File buffer is empty after processing');
       }
       
-      return await extractFileContent(source, buffer);
+      console.log('About to call extractFileContent with buffer size:', buffer.length);
+      const result = await extractFileContent(source, buffer);
+      console.log('extractFileContent returned result length:', result.length);
+      console.log('extractFileContent result preview:', result.substring(0, 100));
+      return result;
     
     case 'url':
       if (source.includes('youtube.com') || source.includes('youtu.be')) {
@@ -63,10 +69,20 @@ export async function extractContent(type: string, source: string, data?: string
 
 async function extractFileContent(filename: string, buffer: Buffer): Promise<string> {
   const extension = filename.toLowerCase().split('.').pop();
+  console.log('extractFileContent called for extension:', extension, 'buffer size:', buffer.length);
+  
+  // Check if buffer is actually a PDF regardless of filename extension
+  const isPdfBuffer = buffer.toString('ascii', 0, 4) === '%PDF';
+  console.log('Buffer PDF check:', isPdfBuffer, 'Extension check:', extension);
+  
+  if (isPdfBuffer || extension === 'pdf') {
+    console.log('Processing as PDF...');
+    const pdfResult = await extractPdfContent(buffer);
+    console.log('extractPdfContent returned, length:', pdfResult.length);
+    return pdfResult;
+  }
   
   switch (extension) {
-    case 'pdf':
-      return await extractPdfContent(buffer);
     
     case 'docx':
       return await extractDocxContent(buffer);
