@@ -45,8 +45,9 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
     extractedContent = await extractContent(input.type, input.source, input.content);
   } catch (error: any) {
     // Content extraction failed - return with minimal info
+    console.error('Content extraction failed for:', input.source, 'Error:', error.message);
     return {
-      extractedContent: typeof input.content === 'string' ? input.content : input.source,
+      extractedContent: `Content extraction failed for ${input.source}. Error: ${error.message}`,
       recommendation: 'Error',
       summary: 'Content extraction failed',
       reasoning: `Content extraction failed: ${error.message}`,
