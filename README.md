@@ -1,5 +1,5 @@
 # DocFilter
-
+<img src="assets/icon.png" alt="DocFilter Icon" width="64" height="64">
 > **⚠️ DISCLAIMER: This software is provided "AS IS" without warranty of any kind. This is a personal project shared for educational purposes. Issues, pull requests, and support requests will not be processed or responded to. Use at your own risk.**
 
 A desktop application for filtering and classifying documents, URLs, and multimedia using local or remote LLMs.
