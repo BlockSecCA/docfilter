@@ -5,7 +5,7 @@ export interface LocalLLMConfig {
   model?: string;
 }
 
-export async function callLocalLLM(prompt: string, content: string, config: LocalLLMConfig): Promise<{ recommendation: string; reasoning: string }> {
+export async function callLocalLLM(prompt: string, content: string, config: LocalLLMConfig): Promise<{ recommendation: string; summary: string; reasoning: string }> {
   try {
     // Support for Ollama API format
     if (config.endpoint.includes('ollama') || config.endpoint.includes(':11434')) {
@@ -20,10 +20,10 @@ export async function callLocalLLM(prompt: string, content: string, config: Loca
   }
 }
 
-async function callOllama(prompt: string, content: string, config: LocalLLMConfig): Promise<{ recommendation: string; reasoning: string }> {
+async function callOllama(prompt: string, content: string, config: LocalLLMConfig): Promise<{ recommendation: string; summary: string; reasoning: string }> {
   const response = await axios.post(config.endpoint, {
     model: config.model || 'llama2',
-    prompt: `${prompt}\n\nContent to analyze:\n\n${content}`,
+    prompt: `${prompt}\n\nPlease provide your response in the following format:\nSUMMARY: [Brief 1-2 sentence summary of the content]\nRECOMMENDATION: [Read or Discard]\nREASONING: [Explanation for your recommendation]\n\nContent to analyze:\n\n${content}`,
     stream: false
   });
 
@@ -31,7 +31,7 @@ async function callOllama(prompt: string, content: string, config: LocalLLMConfi
   return parseAIResponse(aiResponse);
 }
 
-async function callGenericAPI(prompt: string, content: string, config: LocalLLMConfig): Promise<{ recommendation: string; reasoning: string }> {
+async function callGenericAPI(prompt: string, content: string, config: LocalLLMConfig): Promise<{ recommendation: string; summary: string; reasoning: string }> {
   // Try OpenAI-compatible format first
   try {
     const response = await axios.post(config.endpoint, {
@@ -39,11 +39,11 @@ async function callGenericAPI(prompt: string, content: string, config: LocalLLMC
       messages: [
         {
           role: 'system',
-          content: prompt
+          content: prompt + '\n\nPlease provide your response in the following format:\nSUMMARY: [Brief 1-2 sentence summary of the content]\nRECOMMENDATION: [Read or Discard]\nREASONING: [Explanation for your recommendation]'
         },
         {
           role: 'user',
-          content: `Please analyze this content and provide your recommendation:\n\n${content}`
+          content: `Please analyze this content:\n\n${content}`
         }
       ],
       max_tokens: 500,
@@ -55,7 +55,7 @@ async function callGenericAPI(prompt: string, content: string, config: LocalLLMC
   } catch (openaiError) {
     // Fallback to simple prompt format
     const response = await axios.post(config.endpoint, {
-      prompt: `${prompt}\n\nContent to analyze:\n\n${content}`,
+      prompt: `${prompt}\n\nPlease provide your response in the following format:\nSUMMARY: [Brief 1-2 sentence summary of the content]\nRECOMMENDATION: [Read or Discard]\nREASONING: [Explanation for your recommendation]\n\nContent to analyze:\n\n${content}`,
       max_tokens: 500,
       temperature: 0.1
     });
@@ -65,33 +65,50 @@ async function callGenericAPI(prompt: string, content: string, config: LocalLLMC
   }
 }
 
-function parseAIResponse(response: string): { recommendation: string; reasoning: string } {
-  // Try to extract structured response
+function parseAIResponse(response: string): { recommendation: string; summary: string; reasoning: string } {
   const lines = response.split('\n').filter(line => line.trim());
   
   let recommendation = 'Read'; // Default
+  let summary = '';
   let reasoning = response;
   
-  // Look for patterns like "Recommendation: Read" or "Decision: Discard"
+  // Look for structured format
   for (const line of lines) {
-    const lowerLine = line.toLowerCase();
-    if (lowerLine.includes('recommendation:') || lowerLine.includes('decision:')) {
-      if (lowerLine.includes('discard') || lowerLine.includes('skip') || lowerLine.includes('ignore')) {
+    const trimmedLine = line.trim();
+    const lowerLine = trimmedLine.toLowerCase();
+    
+    if (lowerLine.startsWith('summary:')) {
+      summary = trimmedLine.substring(8).trim();
+    } else if (lowerLine.startsWith('recommendation:')) {
+      const recText = trimmedLine.substring(15).trim().toLowerCase();
+      if (recText.includes('discard')) {
         recommendation = 'Discard';
-      } else if (lowerLine.includes('read') || lowerLine.includes('review') || lowerLine.includes('valuable')) {
+      } else if (recText.includes('read')) {
         recommendation = 'Read';
       }
-      break;
+    } else if (lowerLine.startsWith('reasoning:')) {
+      reasoning = trimmedLine.substring(10).trim();
     }
   }
   
-  // Look for the word "discard" or "read" in the response
-  const lowerResponse = response.toLowerCase();
-  if (lowerResponse.includes('discard') && !lowerResponse.includes('not discard')) {
-    recommendation = 'Discard';
-  } else if (lowerResponse.includes('read') || lowerResponse.includes('valuable') || lowerResponse.includes('useful')) {
-    recommendation = 'Read';
+  // Fallback: extract from full response if structured format not found
+  if (!summary) {
+    const sentences = response.split('.').filter(s => s.trim());
+    summary = sentences.slice(0, 2).join('.').trim();
+    if (summary && !summary.endsWith('.')) summary += '.';
   }
   
-  return { recommendation, reasoning };
+  // Fallback: look for recommendation keywords in full response
+  if (recommendation === 'Read') {
+    const lowerResponse = response.toLowerCase();
+    if (lowerResponse.includes('discard') && !lowerResponse.includes('not discard')) {
+      recommendation = 'Discard';
+    }
+  }
+  
+  return { 
+    recommendation, 
+    summary: summary || 'Content analysis summary not available.',
+    reasoning: reasoning || response 
+  };
 }

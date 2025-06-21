@@ -5,6 +5,7 @@ import { getDatabase } from '../database/init';
 export interface ProcessingResult {
   extractedContent: string;
   recommendation: string;
+  summary: string;
   reasoning: string;
   provider: string;
   model: string;
@@ -30,6 +31,7 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
     return {
       extractedContent,
       recommendation: llmResult.recommendation,
+      summary: llmResult.summary,
       reasoning: llmResult.reasoning,
       provider: llmResult.provider,
       model: llmResult.model
@@ -39,6 +41,7 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
     return {
       extractedContent: typeof input.content === 'string' ? input.content : input.source,
       recommendation: 'Error',
+      summary: 'Processing failed',
       reasoning: `Processing failed: ${error.message}`,
       provider: 'none',
       model: 'none'

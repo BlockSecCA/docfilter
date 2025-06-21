@@ -149,11 +149,11 @@ Before using the app, configure your LLM providers:
    - Drag files into the drop zone
    - Click the drop zone to browse and select files
    - Enter URLs in the URL input field
-2. **AI Analysis**: The app extracts content and gets AI recommendations ("Read" or "Discard")
+2. **AI Analysis**: The app extracts content and gets AI recommendations ("Read" or "Discard") with summary and reasoning
 3. **Review Results**: 
    - Browse the inbox with creation timestamps
    - Click items to view full details in the right pane
-   - See extracted content, AI reasoning, and provider used
+   - See AI-generated summary, detailed reasoning, extracted content, and provider used
 4. **Manage Items**:
    - Filter by All/Read/Discard in the inbox
    - Delete items with the × button

@@ -33,6 +33,20 @@ function getChangelog(): string {
   // This ensures it's always available regardless of packaging
   const changelogContent = `# Changelog
 
+## [1.5.0] - 2025-06-21
+
+### Added
+- Content summary section displayed above reasoning in artifact details
+- AI-generated summaries provide quick 1-2 sentence overview of analyzed content
+- Summary appears for new artifacts and when reprocessing existing items
+- Enhanced LLM prompts request structured responses with summary, recommendation, and reasoning
+- Database migration automatically adds summary support to existing installations
+
+### Enhanced
+- All LLM providers (OpenAI, Anthropic, Local/Ollama) now generate content summaries
+- Improved artifact detail view with better information hierarchy
+- Consistent styling between summary and reasoning sections
+
 ## [1.4.1] - 2025-06-20
 
 ### Fixed

@@ -37,8 +37,9 @@ After processing, each item appears in your **Inbox** with:
 - **Yellow "PENDING" badge**: Still being processed
 
 Click any item to see:
+- AI-generated summary (quick overview of the content)
+- AI's detailed reasoning for the recommendation
 - Full extracted content
-- AI's reasoning for the recommendation
 - When it was processed
 - Which AI model was used
 

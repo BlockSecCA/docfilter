@@ -12,6 +12,7 @@ interface Artifact {
   source: string;
   extracted_content?: string;
   ai_recommendation?: string;
+  ai_summary?: string;
   ai_reasoning?: string;
   provider?: string;
   model?: string;

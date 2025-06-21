@@ -7,6 +7,7 @@ interface Artifact {
   source: string;
   extracted_content?: string;
   ai_recommendation?: string;
+  ai_summary?: string;
   ai_reasoning?: string;
   provider?: string;
   model?: string;
@@ -91,6 +92,13 @@ function DetailPane({ artifact, onArtifactUpdated }: DetailPaneProps) {
             <div className={`recommendation-badge ${getRecommendationClass(artifact.ai_recommendation)}`}>
               {artifact.ai_recommendation}
             </div>
+            
+            {artifact.ai_summary && (
+              <div className="summary">
+                <h4>Summary</h4>
+                <p>{artifact.ai_summary}</p>
+              </div>
+            )}
             
             {artifact.ai_reasoning && (
               <div className="reasoning">
