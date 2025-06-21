@@ -493,23 +493,20 @@ function createWindow(): void {
 
   // Add keyboard shortcuts for zoom
   mainWindow.webContents.on('before-input-event', (event, input) => {
-    // Debug logging to see actual key codes
-    if (input.control || input.meta) {
-      console.log('Key pressed:', input.key, 'Code:', input.code, 'Shift:', input.shift);
-    }
+    // Debug logging removed - keeping for now to verify fix
     
     if (input.control || input.meta) { // Ctrl on Windows/Linux, Cmd on macOS
       // Handle zoom in: Ctrl + Plus, Ctrl + Equal, or Ctrl + Shift + Equal, or numpad plus
       if (input.key === 'Equal' || input.key === 'Plus' || 
           (input.key === '=' && !input.shift) || 
           (input.key === '+' && input.shift) ||
-          input.key === 'Add') { // Numpad plus key
+          input.code === 'NumpadAdd') { // Numpad plus key
         // Zoom in: Multiple key combinations for compatibility
         const currentZoom = mainWindow.webContents.getZoomFactor();
         const newZoom = Math.min(currentZoom + 0.1, 3.0); // Max zoom 300%
         mainWindow.webContents.setZoomFactor(newZoom);
         event.preventDefault();
-      } else if (input.key === 'Minus' || input.key === '-' || input.key === 'Subtract') {
+      } else if (input.key === 'Minus' || input.key === '-' || input.code === 'NumpadSubtract') {
         // Zoom out: Ctrl/Cmd + Minus
         const currentZoom = mainWindow.webContents.getZoomFactor();
         const newZoom = Math.max(currentZoom - 0.1, 0.3); // Min zoom 30%
