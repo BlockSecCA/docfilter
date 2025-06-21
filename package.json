@@ -11,6 +11,9 @@
     "build:renderer": "vite build",
     "start": "electron dist/main/main.js",
     "start-headless": "xvfb-run -a electron dist/main/main.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win",
     "pack": "electron-builder --dir"
@@ -20,10 +23,13 @@
   "license": "MIT",
   "description": "",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/pdf-parse": "^1.1.5",
     "@vitejs/plugin-react": "^4.5.2",
     "concurrently": "^9.1.2",
     "electron": "^36.5.0",
+    "jest": "^30.0.2",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"
   },
@@ -58,7 +64,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico"
