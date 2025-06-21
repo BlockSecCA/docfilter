@@ -11,8 +11,6 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     
     steps:
       - name: Checkout code
@@ -35,6 +33,13 @@ jobs:
         
       - name: Build Windows installer
         run: npm run dist:win
+
+      - name: Build Windows installer
+        run: |
+          echo "GH_TOKEN=${GH_TOKEN:0:4}..."  # debug
+          npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  
         
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
