@@ -768,7 +768,6 @@ async function processUrlFromBrowser(url: string): Promise<void> {
     const validation = validateUrl(url);
     if (!validation.valid) {
       console.error('URL validation failed:', validation.message);
-      // TODO: Show error notification to user
       return;
     }
     
@@ -784,15 +783,19 @@ async function processUrlFromBrowser(url: string): Promise<void> {
       const pdfBuffer = await downloadPdf(cleanUrl);
       
       if (pdfBuffer) {
-        // Process as downloaded PDF file
-        console.log('Processing downloaded PDF...');
+        console.log('PDF download successful, buffer size:', pdfBuffer.length);
         artifactInput = {
           type: 'file',
           source: cleanUrl,
           content: pdfBuffer
         };
+        console.log('Created artifactInput for PDF:', {
+          type: artifactInput.type,
+          source: artifactInput.source,
+          contentIsBuffer: artifactInput.content instanceof Buffer,
+          contentSize: pdfBuffer.length
+        });
       } else {
-        // PDF download failed, fall back to web scraping
         console.log('PDF download failed, falling back to web scraping...');
         artifactInput = {
           type: 'url',
@@ -801,7 +804,6 @@ async function processUrlFromBrowser(url: string): Promise<void> {
         };
       }
     } else {
-      // Process as regular URL
       console.log('Processing as web URL...');
       artifactInput = {
         type: 'url',
@@ -820,9 +822,25 @@ async function processUrlFromBrowser(url: string): Promise<void> {
                    typeof artifactInput.content === 'string' ? artifactInput.content.length : 'unknown'
     });
     
-    const result = await processArtifact(artifactInput);
-    console.log('Processing complete:', result.recommendation);
-    console.log('Result extracted content preview:', result.extractedContent.substring(0, 200) + '...');
+    let result;
+    try {
+      result = await processArtifact(artifactInput);
+      console.log('Processing complete:', result.recommendation);
+      console.log('Result extracted content preview:', result.extractedContent.substring(0, 200) + '...');
+    } catch (processingError: any) {
+      console.error('processArtifact threw an error:', processingError.message);
+      console.error('Full error:', processingError);
+      // Create a fallback result to save the error info
+      result = {
+        extractedContent: `Processing error: ${processingError.message}`,
+        recommendation: 'Error',
+        summary: 'Processing failed',
+        reasoning: `Processing failed with error: ${processingError.message}`,
+        provider: 'none',
+        model: 'none',
+        wasTruncated: false
+      };
+    }
     
     // Save to database using the existing pattern
     const db = getDatabase();
