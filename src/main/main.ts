@@ -11,6 +11,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 let mainWindow: BrowserWindow;
 
+function debugLog(message: string, data?: any): void {
+  console.log(message, data || '');
+  // Send to renderer for DevTools visibility
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    const logMessage = data ? `${message} ${JSON.stringify(data)}` : message;
+    mainWindow.webContents.send('debug-log', logMessage);
+  }
+}
+
 function getAppVersion(): string {
   // app.getVersion() returns Electron version, not app version
   // Use direct package.json reading to get actual app version
@@ -737,7 +746,7 @@ function validateUrl(url: string): { valid: boolean; message?: string } {
 
 async function downloadPdf(url: string): Promise<Buffer | null> {
   try {
-    console.log('Attempting to download PDF from:', url);
+    debugLog('Attempting to download PDF from:', url);
     const response = await axios.get(url, {
       responseType: 'arraybuffer',
       timeout: 30000, // 30 second timeout
@@ -751,24 +760,25 @@ async function downloadPdf(url: string): Promise<Buffer | null> {
     // Check if response is actually a PDF
     const contentType = response.headers['content-type'];
     if (contentType && !contentType.includes('application/pdf')) {
-      console.log('Response is not a PDF, content-type:', contentType);
+      debugLog('Response is not a PDF, content-type:', contentType);
       return null;
     }
     
     const buffer = Buffer.from(response.data);
-    console.log('PDF download successful, size:', response.data.byteLength);
-    console.log('Buffer created, size:', buffer.length);
-    console.log('PDF header check:', buffer.toString('ascii', 0, 8));
+    debugLog('PDF download successful, size:', response.data.byteLength);
+    debugLog('Buffer created, size:', buffer.length);
+    debugLog('PDF header check:', buffer.toString('ascii', 0, 8));
     return buffer;
   } catch (error: any) {
-    console.error('PDF download failed:', error.message);
+    debugLog('PDF download failed:', error.message);
     return null;
   }
 }
 
 async function processUrlFromBrowser(url: string): Promise<void> {
   try {
-    console.log('Processing URL from browser:', url);
+    debugLog('=== BROWSER INTEGRATION DEBUG START ===');
+    debugLog('Processing URL from browser:', url);
     
     // Validate URL
     const validation = validateUrl(url);
@@ -779,7 +789,7 @@ async function processUrlFromBrowser(url: string): Promise<void> {
     
     // Clean tracking parameters
     const cleanUrl = cleanTrackingParams(url);
-    console.log('Cleaned URL:', cleanUrl);
+    debugLog('Cleaned URL:', cleanUrl);
     
     let artifactInput: ArtifactInput;
     
@@ -790,18 +800,18 @@ async function processUrlFromBrowser(url: string): Promise<void> {
                      cleanUrl.includes('.pdf#');
     
     if (isPdfUrl) {
-      console.log('Detected PDF URL, attempting download...');
+      debugLog('Detected PDF URL, attempting download...');
       const pdfBuffer = await downloadPdf(cleanUrl);
       
       if (pdfBuffer) {
-        console.log('PDF download successful, buffer size:', pdfBuffer.length);
-        console.log('Downloaded PDF buffer first 20 bytes:', pdfBuffer.subarray(0, 20));
+        debugLog('PDF download successful, buffer size:', pdfBuffer.length);
+        debugLog('Downloaded PDF buffer first 20 bytes:', Array.from(pdfBuffer.subarray(0, 20)));
         artifactInput = {
           type: 'file',
           source: cleanUrl,
           content: pdfBuffer
         };
-        console.log('Created artifactInput for PDF:', {
+        debugLog('Created artifactInput for PDF:', {
           type: artifactInput.type,
           source: artifactInput.source,
           contentIsBuffer: artifactInput.content instanceof Buffer,
@@ -882,12 +892,14 @@ async function processUrlFromBrowser(url: string): Promise<void> {
     
     let result;
     try {
+      debugLog('Starting artifact processing...');
       result = await processArtifact(artifactInput);
-      console.log('Processing complete:', result.recommendation);
-      console.log('Result extracted content length:', result.extractedContent.length);
-      console.log('Result extracted content preview:', result.extractedContent.substring(0, 200) + '...');
-      console.log('Result reasoning preview:', result.reasoning.substring(0, 200) + '...');
-      console.log('Was truncated:', result.wasTruncated);
+      debugLog('Processing complete:', result.recommendation);
+      debugLog('Result extracted content length:', result.extractedContent.length);
+      debugLog('Result extracted content preview:', result.extractedContent.substring(0, 200) + '...');
+      debugLog('Result reasoning preview:', result.reasoning.substring(0, 200) + '...');
+      debugLog('Was truncated:', result.wasTruncated);
+      debugLog('=== BROWSER INTEGRATION DEBUG END ===');
     } catch (processingError: any) {
       console.error('processArtifact threw an error:', processingError.message);
       console.error('Full error:', processingError);

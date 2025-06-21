@@ -10,6 +10,7 @@ export interface ElectronAPI {
   reprocessArtifact: (id: string) => Promise<any>;
   onArtifactAdded: (callback: (artifactId: string) => void) => void;
   onArtifactUpdated: (callback: (artifactId: string) => void) => void;
+  onDebugLog?: (callback: (message: string) => void) => void;
 }
 
 const electronAPI: ElectronAPI = {
@@ -22,6 +23,7 @@ const electronAPI: ElectronAPI = {
   reprocessArtifact: (id) => ipcRenderer.invoke('reprocess-artifact', id),
   onArtifactAdded: (callback) => ipcRenderer.on('artifact-added', (event, artifactId) => callback(artifactId)),
   onArtifactUpdated: (callback) => ipcRenderer.on('artifact-updated', (event, artifactId) => callback(artifactId)),
+  onDebugLog: (callback) => ipcRenderer.on('debug-log', (event, message) => callback(message)),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

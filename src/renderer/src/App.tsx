@@ -100,8 +100,13 @@ function App() {
       }
     };
 
+    const handleDebugLog = (message: string) => {
+      console.log('[MAIN PROCESS DEBUG]:', message);
+    };
+
     window.electronAPI.onArtifactAdded(handleArtifactAdded);
     window.electronAPI.onArtifactUpdated(handleArtifactUpdated);
+    window.electronAPI.onDebugLog?.(handleDebugLog);
   }, [selectedArtifact]);
 
   return (
