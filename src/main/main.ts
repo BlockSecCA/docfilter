@@ -493,6 +493,11 @@ function createWindow(): void {
 
   // Add keyboard shortcuts for zoom
   mainWindow.webContents.on('before-input-event', (event, input) => {
+    // Debug logging to see actual key codes
+    if (input.control || input.meta) {
+      console.log('Key pressed:', input.key, 'Code:', input.code, 'Shift:', input.shift);
+    }
+    
     if (input.control || input.meta) { // Ctrl on Windows/Linux, Cmd on macOS
       // Handle zoom in: Ctrl + Plus, Ctrl + Equal, or Ctrl + Shift + Equal, or numpad plus
       if (input.key === 'Equal' || input.key === 'Plus' || 
