@@ -2,6 +2,14 @@
 
 All notable changes to the AI Triage Assistant will be documented in this file.
 
+## [1.5.1] - 2025-06-21
+
+### Fixed
+- Reprocess functionality bypasses content extraction to prevent "Invalid PDF/DOCX structure" errors
+- Artifact reprocessing now uses stored extracted content directly instead of re-parsing files
+- Improved reprocessing performance by eliminating unnecessary file I/O operations
+- Universal fix for all content types (PDF, DOCX, URLs, YouTube videos)
+
 ## [1.5.0] - 2025-06-21
 
 ### Added
