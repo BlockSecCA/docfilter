@@ -812,8 +812,17 @@ async function processUrlFromBrowser(url: string): Promise<void> {
     
     // Process through the full pipeline (extraction + AI analysis)
     console.log('Starting full artifact processing...');
+    console.log('Artifact input:', {
+      type: artifactInput.type,
+      source: artifactInput.source,
+      contentType: typeof artifactInput.content,
+      contentSize: artifactInput.content instanceof Buffer ? artifactInput.content.length : 
+                   typeof artifactInput.content === 'string' ? artifactInput.content.length : 'unknown'
+    });
+    
     const result = await processArtifact(artifactInput);
     console.log('Processing complete:', result.recommendation);
+    console.log('Result extracted content preview:', result.extractedContent.substring(0, 200) + '...');
     
     // Save to database using the existing pattern
     const db = getDatabase();

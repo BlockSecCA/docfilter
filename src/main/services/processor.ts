@@ -40,9 +40,19 @@ export interface ArtifactInput {
 export async function processArtifact(input: ArtifactInput): Promise<ProcessingResult> {
   let extractedContent: string;
   
+  console.log('processArtifact starting:', {
+    type: input.type,
+    source: input.source,
+    contentType: typeof input.content,
+    contentSize: input.content instanceof Buffer ? input.content.length : 
+                 typeof input.content === 'string' ? input.content.length : 'unknown'
+  });
+  
   // Step 1: Extract content based on type
   try {
+    console.log('Calling extractContent...');
     extractedContent = await extractContent(input.type, input.source, input.content);
+    console.log('extractContent returned text length:', extractedContent.length);
   } catch (error: any) {
     // Content extraction failed - return with minimal info
     console.error('Content extraction failed for:', input.source, 'Error:', error.message);
