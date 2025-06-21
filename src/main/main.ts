@@ -1,9 +1,13 @@
 import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import axios from 'axios';
 import { isDev } from './utils/env';
 import { initDatabase } from './database/init';
 import { registerIpcHandlers } from './ipc/handlers';
+import { processArtifact, ArtifactInput } from './services/processor';
+import { getDatabase } from './database/init';
+import { v4 as uuidv4 } from 'uuid';
 
 let mainWindow: BrowserWindow;
 
@@ -536,18 +540,262 @@ function createWindow(): void {
   mainWindow.loadFile(path.join(__dirname, '../../../renderer/index.html'));
 }
 
-app.whenReady().then(async () => {
-  await initDatabase();
-  registerIpcHandlers();
-  createMenu();
-  createWindow();
+// Browser integration functions
+function cleanTrackingParams(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    const trackingParams = [
+      'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+      'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'ref', 'source',
+      'campaign_id', 'ad_id', 'adset_id', 'msclkid', '_hsenc', '_hsmi'
+    ];
+    
+    trackingParams.forEach(param => {
+      urlObj.searchParams.delete(param);
+    });
+    
+    return urlObj.toString();
+  } catch (error) {
+    console.error('Error cleaning URL parameters:', error);
+    return url; // Return original if parsing fails
+  }
+}
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+function validateUrl(url: string): { valid: boolean; message?: string } {
+  try {
+    const urlObj = new URL(url);
+    
+    // Reject file:// URLs
+    if (urlObj.protocol === 'file:') {
+      return {
+        valid: false,
+        message: 'Local files not supported via browser. Please drag and drop the file directly into DocFilter.'
+      };
+    }
+    
+    // Only allow http/https
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      return {
+        valid: false,
+        message: 'Only HTTP and HTTPS URLs are supported.'
+      };
+    }
+    
+    return { valid: true };
+  } catch (error) {
+    return {
+      valid: false,
+      message: 'Invalid URL format.'
+    };
+  }
+}
+
+async function downloadPdf(url: string): Promise<Buffer | null> {
+  try {
+    console.log('Attempting to download PDF from:', url);
+    const response = await axios.get(url, {
+      responseType: 'arraybuffer',
+      timeout: 30000, // 30 second timeout
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    
+    // Check if response is actually a PDF
+    const contentType = response.headers['content-type'];
+    if (contentType && !contentType.includes('application/pdf')) {
+      console.log('Response is not a PDF, content-type:', contentType);
+      return null;
+    }
+    
+    console.log('PDF download successful, size:', response.data.byteLength);
+    return Buffer.from(response.data);
+  } catch (error: any) {
+    console.error('PDF download failed:', error.message);
+    return null;
+  }
+}
+
+async function processUrlFromBrowser(url: string): Promise<void> {
+  try {
+    console.log('Processing URL from browser:', url);
+    
+    // Validate URL
+    const validation = validateUrl(url);
+    if (!validation.valid) {
+      console.error('URL validation failed:', validation.message);
+      // TODO: Show error notification to user
+      return;
+    }
+    
+    // Clean tracking parameters
+    const cleanUrl = cleanTrackingParams(url);
+    console.log('Cleaned URL:', cleanUrl);
+    
+    let artifactInput: ArtifactInput;
+    
+    // Check if it's a PDF URL
+    if (cleanUrl.toLowerCase().endsWith('.pdf')) {
+      console.log('Detected PDF URL, attempting download...');
+      const pdfBuffer = await downloadPdf(cleanUrl);
+      
+      if (pdfBuffer) {
+        // Process as downloaded PDF file
+        console.log('Processing downloaded PDF...');
+        artifactInput = {
+          type: 'file',
+          source: cleanUrl,
+          content: pdfBuffer
+        };
+      } else {
+        // PDF download failed, fall back to web scraping
+        console.log('PDF download failed, falling back to web scraping...');
+        artifactInput = {
+          type: 'url',
+          source: cleanUrl,
+          content: ''
+        };
+      }
+    } else {
+      // Process as regular URL
+      console.log('Processing as web URL...');
+      artifactInput = {
+        type: 'url',
+        source: cleanUrl,
+        content: ''
+      };
+    }
+    
+    // Process through the full pipeline (extraction + AI analysis)
+    console.log('Starting full artifact processing...');
+    const result = await processArtifact(artifactInput);
+    console.log('Processing complete:', result.recommendation);
+    
+    // Save to database using the existing pattern
+    const db = getDatabase();
+    const artifactId = uuidv4();
+    
+    await new Promise<void>((resolve, reject) => {
+      db.run(
+        `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_summary, ai_reasoning, provider, model, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
+        [
+          artifactId,
+          artifactInput.type,
+          artifactInput.source,
+          result.extractedContent,
+          result.recommendation,
+          result.summary,
+          result.reasoning,
+          result.provider,
+          result.model
+        ],
+        function (err) {
+          if (err) {
+            console.error('Database save error:', err);
+            reject(err);
+          } else {
+            console.log('Artifact saved to database with ID:', artifactId);
+            resolve();
+          }
+        }
+      );
+    });
+    
+    // Focus the main window to show the user the result
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+      
+      // Trigger a refresh of the inbox to show the new item
+      mainWindow.webContents.send('artifact-added', artifactId);
+    }
+    
+  } catch (error: any) {
+    console.error('Error processing URL from browser:', error);
+    // TODO: Show error notification to user
+  }
+}
+
+function handleProtocolUrl(protocolUrl: string): void {
+  try {
+    console.log('Received protocol URL:', protocolUrl);
+    
+    // Parse the protocol URL: docfilter://process?url=...
+    const url = new URL(protocolUrl);
+    
+    if (url.hostname !== 'process') {
+      console.error('Unknown protocol command:', url.hostname);
+      return;
+    }
+    
+    const targetUrl = url.searchParams.get('url');
+    if (!targetUrl) {
+      console.error('No URL parameter found in protocol URL');
+      return;
+    }
+    
+    const decodedUrl = decodeURIComponent(targetUrl);
+    console.log('Extracted target URL:', decodedUrl);
+    
+    // Process the URL
+    processUrlFromBrowser(decodedUrl);
+    
+  } catch (error: any) {
+    console.error('Error handling protocol URL:', error);
+  }
+}
+
+// Handle single instance and protocol registration
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  // Another instance is already running, quit this one
+  app.quit();
+} else {
+  // Register protocol handler for docfilter://
+  app.setAsDefaultProtocolClient('docfilter');
+  
+  // Handle second instance (when protocol is invoked while app is running)
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, focus our window instead
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+    
+    // Check for protocol URL in command line arguments
+    const protocolUrl = commandLine.find(arg => arg.startsWith('docfilter://'));
+    if (protocolUrl) {
+      handleProtocolUrl(protocolUrl);
     }
   });
-});
+  
+  // Handle protocol URL on macOS
+  app.on('open-url', (event, url) => {
+    event.preventDefault();
+    handleProtocolUrl(url);
+  });
+  
+  app.whenReady().then(async () => {
+    await initDatabase();
+    registerIpcHandlers();
+    createMenu();
+    createWindow();
+    
+    // Handle protocol URL passed as command line argument on Windows/Linux
+    const protocolUrl = process.argv.find(arg => arg.startsWith('docfilter://'));
+    if (protocolUrl) {
+      handleProtocolUrl(protocolUrl);
+    }
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+  });
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
