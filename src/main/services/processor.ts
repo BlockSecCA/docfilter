@@ -28,6 +28,7 @@ export interface ProcessingResult {
   reasoning: string;
   provider: string;
   model: string;
+  wasTruncated?: boolean;
 }
 
 export interface ArtifactInput {
@@ -50,7 +51,8 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
       summary: 'Content extraction failed',
       reasoning: `Content extraction failed: ${error.message}`,
       provider: 'none',
-      model: 'none'
+      model: 'none',
+      wasTruncated: false
     };
   }
   
@@ -77,7 +79,8 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
       summary: llmResult.summary,
       reasoning,
       provider: llmResult.provider,
-      model: llmResult.model
+      model: llmResult.model,
+      wasTruncated
     };
   } catch (error: any) {
     // LLM analysis failed but we have extracted content - preserve it!
@@ -96,7 +99,8 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
         ? `Document is too large for AI analysis (token limit exceeded). The extracted content is preserved below for manual review. Consider using a more powerful model or splitting the content into smaller sections.`
         : `AI analysis failed: ${error.message}. The extracted content is preserved below for manual review.`,
       provider: 'none',
-      model: 'none'
+      model: 'none',
+      wasTruncated: false // LLM failed, so no truncation occurred
     };
   }
 }

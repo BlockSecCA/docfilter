@@ -112,14 +112,32 @@
   padding-bottom: 8px;
 }
 
+.recommendation-badges {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
 .recommendation-badge {
   display: inline-block;
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 600;
   font-size: 1rem;
-  margin-bottom: 20px;
   text-transform: uppercase;
+}
+
+.truncated-indicator {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  background: #ffeaa7;
+  color: #b58900;
+  border: 1px solid #f39c12;
 }
 
 .recommendation-badge.read {

@@ -57,6 +57,16 @@ export async function initDatabase(): Promise<void> {
           }
         });
 
+        // Add was_truncated column to existing artifacts table if it doesn't exist
+        db.run(`
+          ALTER TABLE artifacts ADD COLUMN was_truncated INTEGER DEFAULT 0
+        `, (err) => {
+          // Ignore error if column already exists
+          if (err && !err.message.includes('duplicate column name')) {
+            console.error('Error adding was_truncated column:', err);
+          }
+        });
+
         // Configuration table
         db.run(`
           CREATE TABLE IF NOT EXISTS config (

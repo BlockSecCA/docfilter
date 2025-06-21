@@ -17,6 +17,7 @@ interface Artifact {
   provider?: string;
   model?: string;
   created_at: string;
+  was_truncated?: number;
 }
 
 function App() {

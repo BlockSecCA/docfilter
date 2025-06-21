@@ -12,6 +12,7 @@ interface Artifact {
   provider?: string;
   model?: string;
   created_at: string;
+  was_truncated?: number;
 }
 
 interface DetailPaneProps {
@@ -89,8 +90,15 @@ function DetailPane({ artifact, onArtifactUpdated }: DetailPaneProps) {
         {artifact.ai_recommendation && (
           <div className="recommendation-section">
             <h3>AI Recommendation</h3>
-            <div className={`recommendation-badge ${getRecommendationClass(artifact.ai_recommendation)}`}>
-              {artifact.ai_recommendation}
+            <div className="recommendation-badges">
+              <div className={`recommendation-badge ${getRecommendationClass(artifact.ai_recommendation)}`}>
+                {artifact.ai_recommendation}
+              </div>
+              {artifact.was_truncated === 1 && (
+                <div className="truncated-indicator" title="Content was truncated for AI analysis - full content preserved below">
+                  ✂️ Content Truncated
+                </div>
+              )}
             </div>
             
             {artifact.ai_summary && (

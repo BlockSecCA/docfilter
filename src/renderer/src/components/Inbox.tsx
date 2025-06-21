@@ -12,6 +12,7 @@ interface Artifact {
   provider?: string;
   model?: string;
   created_at: string;
+  was_truncated?: number;
 }
 
 interface InboxProps {
@@ -171,6 +172,12 @@ function Inbox({ onArtifactSelect, refreshTrigger }: InboxProps) {
                   {artifact.ai_recommendation && (
                     <span className={`recommendation ${getRecommendationClass(artifact.ai_recommendation)}`}>
                       {artifact.ai_recommendation}
+                    </span>
+                  )}
+                  
+                  {artifact.was_truncated === 1 && (
+                    <span className="truncated-badge" title="Content was truncated for AI analysis">
+                      ✂️ Truncated
                     </span>
                   )}
                 </div>

@@ -13,8 +13,8 @@ export function registerIpcHandlers(): void {
       
       return new Promise((resolve, reject) => {
         db.run(
-          `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_summary, ai_reasoning, provider, model, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
+          `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_summary, ai_reasoning, provider, model, was_truncated, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
           [
             artifactId,
             data.type,
@@ -24,7 +24,8 @@ export function registerIpcHandlers(): void {
             result.summary,
             result.reasoning,
             result.provider,
-            result.model
+            result.model,
+            result.wasTruncated ? 1 : 0
           ],
           function (err) {
             if (err) {
@@ -198,26 +199,56 @@ export function registerIpcHandlers(): void {
       config: providers[provider]
     };
 
-    // Directly call LLM with existing extracted content
+    // Apply same truncation logic as in processor.ts
+    function estimateTokens(text: string): number {
+      return Math.ceil(text.length / 4);
+    }
+    
+    function truncateToTokenLimit(text: string, maxTokens: number): { content: string; wasTruncated: boolean } {
+      const estimatedTokens = estimateTokens(text);
+      
+      if (estimatedTokens <= maxTokens) {
+        return { content: text, wasTruncated: false };
+      }
+      
+      const targetChars = Math.floor(maxTokens * 4 * 0.8);
+      const truncated = text.substring(0, targetChars) + '\n\n[Content truncated due to length...]';
+      
+      return { content: truncated, wasTruncated: true };
+    }
+    
+    const maxTokens = parseInt(config.max_tokens || '100000', 10);
+    const { content: contentForLLM, wasTruncated } = truncateToTokenLimit(artifact.extracted_content, maxTokens);
+    
+    console.log(`Reprocess - Content size: ${estimateTokens(artifact.extracted_content)} estimated tokens, max: ${maxTokens}, truncated: ${wasTruncated}`);
+    
+    // Call LLM with potentially truncated content
     const { callLLM } = await import('../services/llm');
-    const llmResult = await callLLM(systemPrompt, artifact.extracted_content, llmConfig);
+    const llmResult = await callLLM(systemPrompt, contentForLLM, llmConfig);
+    
+    // Add note about truncation to reasoning if content was truncated
+    let reasoning = llmResult.reasoning;
+    if (wasTruncated) {
+      reasoning = `Note: Content was truncated to fit token limits (analyzed first ${Math.floor(maxTokens * 0.8)} tokens). Full content is preserved below.\n\n${reasoning}`;
+    }
     
     const result = {
       extractedContent: artifact.extracted_content,
       recommendation: llmResult.recommendation,
       summary: llmResult.summary,
-      reasoning: llmResult.reasoning,
+      reasoning,
       provider: llmResult.provider,
-      model: llmResult.model
+      model: llmResult.model,
+      wasTruncated
     };
 
     // Update the artifact
     return new Promise((resolve, reject) => {
       db.run(
         `UPDATE artifacts 
-         SET ai_recommendation = ?, ai_summary = ?, ai_reasoning = ?, provider = ?, model = ?, updated_at = datetime('now', 'localtime')
+         SET ai_recommendation = ?, ai_summary = ?, ai_reasoning = ?, provider = ?, model = ?, was_truncated = ?, updated_at = datetime('now', 'localtime')
          WHERE id = ?`,
-        [result.recommendation, result.summary, result.reasoning, result.provider, result.model, id],
+        [result.recommendation, result.summary, result.reasoning, result.provider, result.model, result.wasTruncated ? 1 : 0, id],
         function (err) {
           if (err) {
             reject(err);

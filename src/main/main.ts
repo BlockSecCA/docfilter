@@ -747,8 +747,8 @@ async function processUrlFromBrowser(url: string): Promise<void> {
     
     await new Promise<void>((resolve, reject) => {
       db.run(
-        `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_summary, ai_reasoning, provider, model, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
+        `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_summary, ai_reasoning, provider, model, was_truncated, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
         [
           artifactId,
           artifactInput.type,
@@ -758,7 +758,8 @@ async function processUrlFromBrowser(url: string): Promise<void> {
           result.summary,
           result.reasoning,
           result.provider,
-          result.model
+          result.model,
+          result.wasTruncated ? 1 : 0
         ],
         function (err) {
           if (err) {
