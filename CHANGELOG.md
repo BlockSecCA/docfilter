@@ -2,6 +2,19 @@
 
 All notable changes to DocFilter will be documented in this file.
 
+## [1.6.0] - 2025-06-21
+
+### Added
+- Font size zoom controls with keyboard shortcuts (Ctrl/Cmd + Plus/Minus/0)
+- Mouse wheel zoom support (Ctrl/Cmd + scroll wheel)
+- Zoom menu items in View menu (Zoom In, Zoom Out, Reset Zoom)
+- Zoom level limits: 30% minimum, 300% maximum for optimal usability
+- Cross-platform zoom support (Windows, macOS, Linux)
+
+### Enhanced
+- Improved accessibility with adjustable text size for better readability
+- Enhanced user experience with familiar zoom controls from other applications
+
 ## [1.5.1] - 2025-06-21
 
 ### Fixed

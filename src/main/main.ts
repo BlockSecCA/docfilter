@@ -33,6 +33,19 @@ function getChangelog(): string {
   // This ensures it's always available regardless of packaging
   const changelogContent = `# Changelog
 
+## [1.6.0] - 2025-06-21
+
+### Added
+- Font size zoom controls with keyboard shortcuts (Ctrl/Cmd + Plus/Minus/0)
+- Mouse wheel zoom support (Ctrl/Cmd + scroll wheel)
+- Zoom menu items in View menu (Zoom In, Zoom Out, Reset Zoom)
+- Zoom level limits: 30% minimum, 300% maximum for optimal usability
+- Cross-platform zoom support (Windows, macOS, Linux)
+
+### Enhanced
+- Improved accessibility with adjustable text size for better readability
+- Enhanced user experience with familiar zoom controls from other applications
+
 ## [1.5.1] - 2025-06-21
 
 ### Fixed
@@ -292,6 +305,7 @@ function createMenu(): void {
                   <p><strong>Left Panel:</strong> Drop zone for adding new content + Inbox showing all processed items with recommendations</p>
                   <p><strong>Right Panel:</strong> Detailed view of selected items + Shows extracted content and AI analysis</p>
                   <p><strong>Resizable Panels:</strong> Drag the vertical divider between panels to adjust their size. Your preferred size is automatically saved.</p>
+                  <p><strong>Zoom Controls:</strong> Use keyboard shortcuts (Ctrl/Cmd + Plus/Minus/0), mouse wheel (Ctrl/Cmd + scroll), or View menu to adjust text size (30%-300%).</p>
                   
                   <h2>Data Privacy</h2>
                   <ul>
@@ -473,7 +487,43 @@ function createWindow(): void {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
+      zoomFactor: 1.0, // Default zoom level
     },
+  });
+
+  // Add keyboard shortcuts for zoom
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.control || input.meta) { // Ctrl on Windows/Linux, Cmd on macOS
+      if (input.key === 'Equal' || input.key === 'Plus') {
+        // Zoom in: Ctrl/Cmd + Plus or Ctrl/Cmd + Equal
+        const currentZoom = mainWindow.webContents.getZoomFactor();
+        const newZoom = Math.min(currentZoom + 0.1, 3.0); // Max zoom 300%
+        mainWindow.webContents.setZoomFactor(newZoom);
+        event.preventDefault();
+      } else if (input.key === 'Minus') {
+        // Zoom out: Ctrl/Cmd + Minus
+        const currentZoom = mainWindow.webContents.getZoomFactor();
+        const newZoom = Math.max(currentZoom - 0.1, 0.3); // Min zoom 30%
+        mainWindow.webContents.setZoomFactor(newZoom);
+        event.preventDefault();
+      } else if (input.key === '0') {
+        // Reset zoom: Ctrl/Cmd + 0
+        mainWindow.webContents.setZoomFactor(1.0);
+        event.preventDefault();
+      }
+    }
+  });
+
+  // Add mouse wheel zoom support
+  mainWindow.webContents.on('zoom-changed', (event, zoomDirection) => {
+    const currentZoom = mainWindow.webContents.getZoomFactor();
+    if (zoomDirection === 'in') {
+      const newZoom = Math.min(currentZoom + 0.1, 3.0);
+      mainWindow.webContents.setZoomFactor(newZoom);
+    } else {
+      const newZoom = Math.max(currentZoom - 0.1, 0.3);
+      mainWindow.webContents.setZoomFactor(newZoom);
+    }
   });
 
   // Force production mode - always load built files

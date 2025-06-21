@@ -88,6 +88,12 @@ Your system prompt should clearly describe what you're looking for. Examples:
 - Drag the vertical divider between panels to adjust their size
 - Your preferred size is automatically saved
 
+**Zoom Controls:**
+- **Keyboard shortcuts**: Ctrl/Cmd + Plus to zoom in, Ctrl/Cmd + Minus to zoom out, Ctrl/Cmd + 0 to reset zoom
+- **Mouse wheel**: Hold Ctrl/Cmd and scroll to zoom in/out
+- **Menu**: Use View menu → Zoom In/Zoom Out/Reset Zoom
+- **Zoom range**: 30% to 300% for optimal readability
+
 ## Data Privacy
 
 - All your content and AI recommendations are stored locally on your computer
