@@ -339,3 +339,7 @@ sudo apt install -y libnss3 libnspr4 libatk-bridge2.0-0 libdrm2 libxcomposite1 l
 
 # Or run on Windows instead (recommended)
 ```
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for planned features and enhancements including dark theme support, additional file formats, browser extensions, and advanced AI capabilities.

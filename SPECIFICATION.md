@@ -177,6 +177,7 @@ CREATE TABLE artifacts (
   ai_reasoning TEXT,                    -- AI's detailed reasoning
   provider TEXT,                        -- 'openai', 'anthropic', 'local'
   model TEXT,                          -- Model name used
+  was_truncated INTEGER DEFAULT 0,      -- 1 if content was truncated for AI analysis (v1.7.0+)
   created_at DATETIME,
   updated_at DATETIME
 );
@@ -185,7 +186,7 @@ CREATE TABLE artifacts (
 **Configuration Table:**
 ```sql
 CREATE TABLE config (
-  key TEXT PRIMARY KEY,                 -- 'system_prompt', 'default_provider', 'providers'
+  key TEXT PRIMARY KEY,                 -- 'system_prompt', 'default_provider', 'providers', 'max_tokens'
   value TEXT NOT NULL,                  -- JSON for providers config
   updated_at DATETIME
 );
@@ -287,12 +288,19 @@ CREATE TABLE config (
 
 ## Version History & Roadmap
 
-### Current Version: 1.6.0
+### Current Version: 1.7.0
 
 **Major Features Implemented:**
-- ✅ Multi-provider AI analysis (OpenAI, Anthropic, Local)
+- ✅ Multi-provider AI analysis (OpenAI, Anthropic, Local) 
+- ✅ Browser integration with bookmarklet and protocol handler
+- ✅ Configurable token limits with smart content truncation
+- ✅ Visual truncation status indicators
 - ✅ Content summaries with detailed reasoning
 - ✅ Comprehensive zoom controls for accessibility
+- ✅ Enhanced error handling with content preservation
+- ✅ Event-based UI refresh system
+- ✅ URL cleaning and PDF auto-download
+- ✅ Single instance management
 - ✅ Resizable interface panels
 - ✅ Built-in help and documentation system
 - ✅ Unit testing framework with 58 test cases
@@ -343,29 +351,13 @@ CREATE TABLE config (
 
 ---
 
-## Future Considerations
+## Future Development
 
-### Potential Enhancements
+See [ROADMAP.md](ROADMAP.md) for detailed planned enhancements including:
 
-**Content Processing:**
-- Additional file format support (RTF, EPUB, etc.)
-- OCR integration for image-based PDFs
-- Enhanced web content extraction with JavaScript rendering
-
-**AI Integration:**
-- Custom prompt templates for different content types
-- Batch processing capabilities
-- AI provider fallback mechanisms
-
-**User Experience:**
-- Dark theme support
-- Keyboard navigation shortcuts
-- Advanced filtering and search capabilities
-
-**Technical Improvements:**
-- Plugin architecture for community extensions
-- Export/import functionality for settings and data
-- Advanced performance optimizations
+- **Near-term**: Dark theme, keyboard shortcuts, advanced filtering, full-text search
+- **Medium-term**: Additional file formats, OCR integration, browser extensions, multi-provider analysis  
+- **Long-term**: Plugin architecture, workflow automation, research-focused features
 
 ### Architectural Evolution
 
