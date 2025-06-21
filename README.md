@@ -10,7 +10,7 @@ A desktop application for filtering and classifying documents, URLs, and multime
 DocFilter implements a **three-tier architecture** within the Electron framework:
 
 ```
-┌─────────────────┐    IPC    ┌─────────────────┐    SQL    ┌─────────────────┐
+┌─────────────────┐    IPC     ┌─────────────────┐    SQL     ┌─────────────────┐
 │ Presentation    │ ◄────────► │ Application     │ ◄────────► │ Data Tier       │
 │ Tier            │            │ Tier            │            │                 │
 │ - React UI      │            │ - Business      │            │ - SQLite DB     │
