@@ -3,6 +3,16 @@ import * as cheerio from 'cheerio';
 
 export async function extractWebContent(url: string): Promise<string> {
   try {
+    // Check if this is a PDF URL that shouldn't be processed as web content
+    const isPdfUrl = url.toLowerCase().endsWith('.pdf') || 
+                     url.includes('arxiv.org/pdf/') ||
+                     url.includes('.pdf?') ||
+                     url.includes('.pdf#');
+    
+    if (isPdfUrl) {
+      throw new Error('PDF URLs should be processed as files, not web content');
+    }
+    
     // Try simple HTTP request first
     const response = await axios.get(url, {
       timeout: 10000,
@@ -10,6 +20,13 @@ export async function extractWebContent(url: string): Promise<string> {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
     });
+
+    // Check if response is actually a PDF (by content-type or content)
+    const contentType = response.headers ? (response.headers['content-type'] || '') : '';
+    if (contentType.includes('application/pdf') || 
+        (typeof response.data === 'string' && response.data.startsWith('%PDF-'))) {
+      throw new Error('Received PDF content instead of HTML - cannot parse as web content');
+    }
 
     const $ = cheerio.load(response.data);
     

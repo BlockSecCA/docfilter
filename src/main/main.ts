@@ -777,8 +777,13 @@ async function processUrlFromBrowser(url: string): Promise<void> {
     
     let artifactInput: ArtifactInput;
     
-    // Check if it's a PDF URL
-    if (cleanUrl.toLowerCase().endsWith('.pdf')) {
+    // Check if it's a PDF URL (by extension or known PDF patterns)
+    const isPdfUrl = cleanUrl.toLowerCase().endsWith('.pdf') || 
+                     cleanUrl.includes('arxiv.org/pdf/') ||
+                     cleanUrl.includes('.pdf?') ||
+                     cleanUrl.includes('.pdf#');
+    
+    if (isPdfUrl) {
       console.log('Detected PDF URL, attempting download...');
       const pdfBuffer = await downloadPdf(cleanUrl);
       
@@ -796,12 +801,57 @@ async function processUrlFromBrowser(url: string): Promise<void> {
           contentSize: pdfBuffer.length
         });
       } else {
-        console.log('PDF download failed, falling back to web scraping...');
-        artifactInput = {
-          type: 'url',
-          source: cleanUrl,
-          content: ''
+        console.log('PDF download failed, cannot process as web content');
+        // Don't fall back to web scraping for PDF URLs - this causes stack overflow
+        // Instead, create an error artifact to inform the user
+        const result = {
+          extractedContent: `PDF download failed for ${cleanUrl}. This may be due to:\n\n1. The PDF requires authentication or login\n2. The server is blocking automated downloads\n3. The PDF link is invalid or expired\n\nPlease try:\n- Downloading the PDF manually and drag-dropping it into DocFilter\n- Checking if the PDF URL is accessible in your browser\n- Using the direct PDF link if this is an embedded viewer`,
+          recommendation: 'Error',
+          summary: 'PDF download failed',
+          reasoning: 'PDF download failed - manual download may be required',
+          provider: 'none',
+          model: 'none',
+          wasTruncated: false
         };
+        
+        // Save error result directly and return early
+        const db = getDatabase();
+        const artifactId = uuidv4();
+        
+        await new Promise<void>((resolve, reject) => {
+          db.run(
+            `INSERT INTO artifacts (id, type, source, extracted_content, ai_recommendation, ai_summary, ai_reasoning, provider, model, was_truncated, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`,
+            [
+              artifactId,
+              'url', // Keep as 'url' type for consistency
+              cleanUrl,
+              result.extractedContent,
+              result.recommendation,
+              result.summary,
+              result.reasoning,
+              result.provider,
+              result.model,
+              result.wasTruncated ? 1 : 0
+            ],
+            function(err) {
+              if (err) {
+                console.error('Database insert error:', err);
+                reject(err);
+              } else {
+                console.log(`Artifact added from browser integration: ${artifactId}`);
+                resolve();
+              }
+            }
+          );
+        });
+        
+        // Notify renderer to refresh
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('artifact-added');
+        }
+        
+        return; // Exit early to avoid further processing
       }
     } else {
       console.log('Processing as web URL...');
