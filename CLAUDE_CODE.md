@@ -1,14 +1,16 @@
-# Claude Code - AI Triage Assistant Project Guide
+# Claude Code - DocFilter Project Guide
 
 **Quick Reference for Claude Code sessions to understand this project rapidly**
 
 ## 🎯 Project Overview
 
-**AI Triage Assistant** - Electron desktop app that analyzes documents, URLs, and multimedia using AI to recommend "Read" or "Discard" with summaries and reasoning.
+**DocFilter** - Electron desktop app that analyzes documents, URLs, and multimedia using AI to recommend "Read" or "Discard" with summaries and reasoning.
 
 - **Tech Stack**: Electron + React + TypeScript + SQLite + Vite
-- **Current Version**: 1.5.0 (as of 2025-06-21)
+- **Current Version**: 1.6.0 (as of 2025-06-21)
 - **Purpose**: Document triage and classification using local/remote LLMs
+
+📋 **For complete technical specifications, see [SPECIFICATION.md](SPECIFICATION.md)**
 
 ## 📁 Key Files to Read First
 
@@ -47,76 +49,22 @@ src/renderer/src/components/ConfigModal.tsx # AI provider configuration
 
 ### **Documentation**
 ```
-README.md      # User-facing documentation
-HELP.md        # Built-in help content
-CHANGELOG.md   # Version history
-package.json   # Dependencies and scripts
-```
-
-## 🗃️ Database Schema (SQLite)
-
-### **artifacts table**
-```sql
-CREATE TABLE artifacts (
-  id TEXT PRIMARY KEY,
-  type TEXT NOT NULL,                    -- 'file', 'url', 'youtube'
-  source TEXT NOT NULL,                  -- Original file path or URL
-  extracted_content TEXT,               -- Processed content
-  ai_recommendation TEXT,               -- 'Read' or 'Discard'
-  ai_summary TEXT,                      -- NEW in v1.5.0: Content summary
-  ai_reasoning TEXT,                    -- AI's detailed reasoning
-  provider TEXT,                        -- 'openai', 'anthropic', 'local'
-  model TEXT,                          -- Model name used
-  created_at DATETIME,
-  updated_at DATETIME
-);
-```
-
-### **config table**
-```sql
-CREATE TABLE config (
-  key TEXT PRIMARY KEY,                 -- 'system_prompt', 'default_provider', 'providers'
-  value TEXT NOT NULL,                  -- JSON for providers config
-  updated_at DATETIME
-);
+README.md         # User-facing documentation
+HELP.md           # Built-in help content
+CHANGELOG.md      # Version history
+SPECIFICATION.md  # Complete technical specifications
+package.json      # Dependencies and scripts
 ```
 
 ## 🔄 Core Workflow
 
 1. **Content Input** → DropZone accepts files/URLs
-2. **Content Extraction** → Extractors process different formats
+2. **Content Extraction** → Extractors process different formats  
 3. **AI Analysis** → LLM providers generate summary + recommendation + reasoning
 4. **Storage** → SQLite stores results
 5. **Display** → DetailPane shows summary above reasoning
 
-## 🧩 Key TypeScript Interfaces
-
-### **Artifact Interface (used across app)**
-```typescript
-interface Artifact {
-  id: string;
-  type: string;
-  source: string;
-  extracted_content?: string;
-  ai_recommendation?: string;
-  ai_summary?: string;           // Added in v1.5.0
-  ai_reasoning?: string;
-  provider?: string;
-  model?: string;
-  created_at: string;
-}
-```
-
-### **LLM Result Interface**
-```typescript
-interface LLMResult {
-  recommendation: string;        // 'Read' or 'Discard'
-  summary: string;              // Brief content overview
-  reasoning: string;            // Detailed explanation
-  provider: string;
-  model: string;
-}
-```
+*For detailed database schema and TypeScript interfaces, see [SPECIFICATION.md](SPECIFICATION.md)*
 
 ## 🚀 Development Commands
 
@@ -131,6 +79,11 @@ npm run build
 npm start
 # OR
 npx electron dist/main/src/main/main.js
+
+# Testing
+npm test              # Run unit tests
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage
 
 # Package for distribution
 npm run dist        # All platforms
@@ -159,21 +112,7 @@ App.tsx
 └── ConfigModal.tsx (AI provider settings)
 ```
 
-## 🔧 Recent Major Changes (v1.5.0)
-
-### **Summary Feature Implementation**
-- Added `ai_summary` column to database with migration
-- Enhanced all LLM providers to generate structured responses
-- Updated UI to show Summary above Reasoning
-- Modified prompts to request: "SUMMARY: ... RECOMMENDATION: ... REASONING: ..."
-- Backward compatible: existing artifacts work without summaries
-
-### **Files Modified in v1.5.0**
-- Database schema + migration logic
-- All LLM provider implementations
-- UI components for summary display
-- TypeScript interfaces updated
-- Documentation updated
+*For version history and recent changes, see [CHANGELOG.md](CHANGELOG.md)*
 
 ## 🛠️ Common Development Tasks
 
@@ -197,6 +136,12 @@ App.tsx
 1. Modify React components in `src/renderer/src/components/`
 2. Update CSS files for styling
 3. Ensure TypeScript interfaces match
+
+### **Adding Tests**
+1. Create test files in `tests/` directory 
+2. Follow existing patterns: `*.test.ts` for unit tests
+3. Run `npm test` to verify all 58 existing tests still pass
+4. Use Jest with mocking for external dependencies
 
 ## 📍 Important Conventions
 
@@ -268,4 +213,4 @@ When starting a new Claude Code session:
 6. **Scan README.md** for any updates
 7. **Read any TODOs** or issues mentioned by user
 
-This guide should get you up to speed quickly on the AI Triage Assistant codebase! 🚀
+This guide should get you up to speed quickly on the DocFilter codebase! 🚀
