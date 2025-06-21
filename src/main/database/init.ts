@@ -10,7 +10,7 @@ export async function initDatabase(): Promise<void> {
     const userDataPath = app.getPath('userData');
     const dbPath = path.join(userDataPath, 'triage.db');
     
-    console.log('Database will be created at:', dbPath);
+    console.log('Database location:', dbPath);
     
     // Ensure user data directory exists before creating database
     try {
