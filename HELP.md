@@ -1,8 +1,8 @@
-# AI Triage Assistant - User Guide
+# DocFilter - User Guide
 
-## What is AI Triage Assistant?
+## What is DocFilter?
 
-AI Triage Assistant helps you quickly decide which documents, web pages, and videos are worth your time by using artificial intelligence to analyze and recommend "Read" or "Discard" for each item.
+DocFilter helps you quickly decide which documents, web pages, and videos are worth your time by using artificial intelligence to analyze and recommend "Read" or "Discard" for each item.
 
 ## Getting Started
 

@@ -1,5 +1,5 @@
 {
-  "name": "reading_agent",
+  "name": "docfilter",
   "version": "1.5.1",
   "main": "dist/main/src/main/main.js",
   "scripts": {
@@ -44,8 +44,8 @@
     "uuid": "^11.1.0"
   },
   "build": {
-    "appId": "com.blocksec.ai-triage-assistant",
-    "productName": "AI Triage Assistant",
+    "appId": "com.blocksec.docfilter",
+    "productName": "DocFilter",
     "directories": {
       "output": "release"
     },

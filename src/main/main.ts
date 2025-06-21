@@ -113,7 +113,7 @@ function getChangelog(): string {
 ## [1.0] - 2025-06-20
 
 ### Added
-- Initial release of AI Triage Assistant
+- Initial release of DocFilter
 - Multi-format content support (PDF, DOCX, TXT, URLs, YouTube)
 - AI analysis with OpenAI, Anthropic, and local LLM providers
 - Local SQLite storage for all data

@@ -1,8 +1,8 @@
-# AI Triage Assistant
+# DocFilter
 
 > **⚠️ DISCLAIMER: This software is provided "AS IS" without warranty of any kind. This is a personal project shared for educational purposes. Issues, pull requests, and support requests will not be processed or responded to. Use at your own risk.**
 
-A desktop application for triaging and classifying documents, URLs, and multimedia using local or remote LLMs.
+A desktop application for filtering and classifying documents, URLs, and multimedia using local or remote LLMs.
 
 ## Architecture
 

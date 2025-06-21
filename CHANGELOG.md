@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the AI Triage Assistant will be documented in this file.
+All notable changes to DocFilter will be documented in this file.
 
 ## [1.5.1] - 2025-06-21
 
