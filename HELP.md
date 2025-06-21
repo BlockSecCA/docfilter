@@ -11,7 +11,12 @@ Before using the app, you need to set up an AI provider:
 
 1. Click the **Config** button (⚙️) in the top-right corner
 2. Write instructions for the AI in the **System Prompt** box (e.g., "You are helping me decide what content is worth reading. Focus on business and technology topics.")
-3. Choose and configure at least one AI provider:
+3. **Set Token Limit**: Configure max tokens based on your model:
+   - **GPT-3.5**: ~16,000 tokens
+   - **GPT-4**: ~128,000 tokens
+   - **Claude**: ~200,000 tokens
+   - **Local LLMs**: Varies by model
+4. Choose and configure at least one AI provider:
    - **OpenAI**: Enter your API key (recommended: use GPT-4o model)
    - **Anthropic**: Enter your API key (use Claude-3-Haiku or newer)
    - **Local LLM**: Enter your local server address (e.g., Ollama)
@@ -173,6 +178,62 @@ Your system prompt should clearly describe what you're looking for. Examples:
 **Wrong URL being sent:**
 - Some sites use complex URL structures - the bookmarklet sends the current page URL
 - For embedded PDFs, try right-clicking the PDF and copying its direct link instead
+
+## Understanding Token Management
+
+DocFilter intelligently handles content that's too large for AI analysis:
+
+### How It Works
+
+1. **Content Extraction**: Always extracts full text from PDFs, documents, and web pages
+2. **Token Estimation**: Estimates content size using ~4 characters per token
+3. **Smart Truncation**: If content exceeds your token limit, it's truncated for AI analysis
+4. **Full Preservation**: Complete extracted content is always saved regardless of truncation
+
+### Visual Status Indicators
+
+Look for these badges to understand what the AI analyzed:
+
+- **No badge**: AI analyzed the complete content
+- **✂️ Truncated**: AI analyzed partial content (first ~80% of your token limit)
+- **❌ Error**: AI analysis failed, but full content is preserved
+
+### When Content Gets Truncated
+
+**Large arXiv Papers**: Many research papers exceed token limits
+- AI analyzes the beginning (introduction, abstract, methodology)
+- Full paper text is preserved for you to read manually
+- You can still get useful "Read" or "Discard" recommendations
+
+**Massive Documents**: Very long PDFs or web pages
+- AI analyzes what fits within your token budget
+- Remaining content is available in the detail view
+- Consider increasing token limits for better coverage
+
+### Optimizing Token Usage
+
+**Increase Token Limits**: 
+- Go to Config → Token Limit
+- Set higher limits for more powerful models
+- GPT-4: up to ~128k tokens, Claude: up to ~200k tokens
+
+**Reprocess with Higher Limits**:
+- Update your token limit in config
+- Click the 🔄 button on any artifact
+- AI will analyze more content with the new limit
+- Truncation badge may disappear if content now fits
+
+**Model Recommendations**:
+- **GPT-3.5**: Good for small to medium documents (~16k tokens)
+- **GPT-4**: Excellent for large documents (~128k tokens)
+- **Claude**: Best for very large content (~200k tokens)
+
+### Why This System Works
+
+- **No Lost Content**: Full text is always preserved, never lost
+- **Better Than Errors**: Partial analysis is better than complete failure
+- **Upgrade Path**: Easy to reprocess with better models later
+- **Clear Feedback**: Visual indicators show exactly what happened
 
 ---
 

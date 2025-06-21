@@ -5,17 +5,31 @@ All notable changes to DocFilter will be documented in this file.
 ## [1.7.0] - 2025-06-21
 
 ### Added
-- Browser integration with custom protocol handler (`docfilter://`)
-- Bookmarklet for sending URLs from any browser to DocFilter
-- Automatic PDF download and processing from URLs ending in .pdf
-- URL tracking parameter cleaning (removes utm_source, fbclid, etc.)
-- Single instance management - protocol URLs route to existing window
-- Graceful error handling for invalid URLs and file:// protocol rejection
+- **Browser Integration**: Custom protocol handler (`docfilter://`) for seamless URL processing
+- **Bookmarklet**: One-click URL sending from any browser to DocFilter
+- **Automatic PDF Processing**: Direct download and analysis of PDF URLs (perfect for arXiv papers)
+- **Configurable Token Limits**: User-defined max token setting for different AI models
+- **Smart Content Truncation**: Preserves full content while fitting AI analysis within token limits
+- **Truncation Status Indicators**: Visual badges showing when content was truncated vs analyzed fully
+- **Enhanced Error Handling**: Always preserves extracted content even when AI analysis fails
+- **URL Cleaning**: Automatic removal of tracking parameters (utm_source, fbclid, etc.)
+- **Single Instance Management**: Protocol URLs route to existing window instead of opening new instances
+- **Event-Based UI Refresh**: Real-time updates when processing completes
 
 ### Enhanced
-- Seamless workflow for processing arXiv papers and web content from browsers
-- Comprehensive browser setup instructions in HELP.md
-- Cross-platform protocol handler registration (Windows, macOS, Linux)
+- **Model Flexibility**: Configure token limits based on your AI model (GPT-3.5: ~16k, GPT-4: ~128k, Claude: ~200k)
+- **Large Document Handling**: Large arXiv PDFs now get partial AI analysis while preserving full text
+- **Reprocessing Intelligence**: Reprocess with higher token limits to analyze more content
+- **Visual Feedback**: Clear indicators in inbox and detail views for truncation status
+- **Browser Compatibility**: Full support across Firefox, Chrome, Edge, and Safari
+- **Cross-Platform Support**: Protocol handler registration on Windows, macOS, and Linux
+- **Comprehensive Documentation**: Updated help system with browser setup and token management guides
+
+### Technical Improvements
+- **Token Estimation**: Smart character-to-token conversion for content sizing
+- **Graceful Degradation**: Failed AI analysis preserves extracted content for manual review
+- **Database Schema**: Added truncation tracking with automatic migration
+- **Better Error Messages**: Specific guidance for token limit vs other API failures
 
 ## [1.6.0] - 2025-06-21
 

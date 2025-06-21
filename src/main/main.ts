@@ -239,6 +239,14 @@ function createMenu(): void {
                   <ol>
                     <li>Click the <strong>Config</strong> button in the top-right corner</li>
                     <li>Write instructions for the AI in the <strong>System Prompt</strong> box (e.g., "You are helping me decide what content is worth reading. Focus on business and technology topics.")</li>
+                    <li><strong>Set Token Limit</strong>: Configure max tokens based on your model:
+                      <ul>
+                        <li><strong>GPT-3.5</strong>: ~16,000 tokens</li>
+                        <li><strong>GPT-4</strong>: ~128,000 tokens</li>
+                        <li><strong>Claude</strong>: ~200,000 tokens</li>
+                        <li><strong>Local LLMs</strong>: Varies by model</li>
+                      </ul>
+                    </li>
                     <li>Choose and configure at least one AI provider:
                       <ul>
                         <li><strong>OpenAI</strong>: Enter your API key (recommended: use GPT-4o model)</li>
@@ -392,6 +400,72 @@ function createMenu(): void {
                   <ul>
                     <li>Some sites use complex URL structures - the bookmarklet sends the current page URL</li>
                     <li>For embedded PDFs, try right-clicking the PDF and copying its direct link instead</li>
+                  </ul>
+
+                  <h2>Understanding Token Management</h2>
+                  
+                  <p>DocFilter intelligently handles content that's too large for AI analysis:</p>
+                  
+                  <h3>How It Works</h3>
+                  <ol>
+                    <li><strong>Content Extraction</strong>: Always extracts full text from PDFs, documents, and web pages</li>
+                    <li><strong>Token Estimation</strong>: Estimates content size using ~4 characters per token</li>
+                    <li><strong>Smart Truncation</strong>: If content exceeds your token limit, it's truncated for AI analysis</li>
+                    <li><strong>Full Preservation</strong>: Complete extracted content is always saved regardless of truncation</li>
+                  </ol>
+                  
+                  <h3>Visual Status Indicators</h3>
+                  <p>Look for these badges to understand what the AI analyzed:</p>
+                  <ul>
+                    <li><strong>No badge</strong>: AI analyzed the complete content</li>
+                    <li><strong>✂️ Truncated</strong>: AI analyzed partial content (first ~80% of your token limit)</li>
+                    <li><strong>❌ Error</strong>: AI analysis failed, but full content is preserved</li>
+                  </ul>
+                  
+                  <h3>When Content Gets Truncated</h3>
+                  <p><strong>Large arXiv Papers</strong>: Many research papers exceed token limits</p>
+                  <ul>
+                    <li>AI analyzes the beginning (introduction, abstract, methodology)</li>
+                    <li>Full paper text is preserved for you to read manually</li>
+                    <li>You can still get useful "Read" or "Discard" recommendations</li>
+                  </ul>
+                  
+                  <p><strong>Massive Documents</strong>: Very long PDFs or web pages</p>
+                  <ul>
+                    <li>AI analyzes what fits within your token budget</li>
+                    <li>Remaining content is available in the detail view</li>
+                    <li>Consider increasing token limits for better coverage</li>
+                  </ul>
+                  
+                  <h3>Optimizing Token Usage</h3>
+                  <p><strong>Increase Token Limits</strong>:</p>
+                  <ul>
+                    <li>Go to Config → Token Limit</li>
+                    <li>Set higher limits for more powerful models</li>
+                    <li>GPT-4: up to ~128k tokens, Claude: up to ~200k tokens</li>
+                  </ul>
+                  
+                  <p><strong>Reprocess with Higher Limits</strong>:</p>
+                  <ul>
+                    <li>Update your token limit in config</li>
+                    <li>Click the 🔄 button on any artifact</li>
+                    <li>AI will analyze more content with the new limit</li>
+                    <li>Truncation badge may disappear if content now fits</li>
+                  </ul>
+                  
+                  <p><strong>Model Recommendations</strong>:</p>
+                  <ul>
+                    <li><strong>GPT-3.5</strong>: Good for small to medium documents (~16k tokens)</li>
+                    <li><strong>GPT-4</strong>: Excellent for large documents (~128k tokens)</li>
+                    <li><strong>Claude</strong>: Best for very large content (~200k tokens)</li>
+                  </ul>
+                  
+                  <h3>Why This System Works</h3>
+                  <ul>
+                    <li><strong>No Lost Content</strong>: Full text is always preserved, never lost</li>
+                    <li><strong>Better Than Errors</strong>: Partial analysis is better than complete failure</li>
+                    <li><strong>Upgrade Path</strong>: Easy to reprocess with better models later</li>
+                    <li><strong>Clear Feedback</strong>: Visual indicators show exactly what happened</li>
                   </ul>
 
                   <hr>

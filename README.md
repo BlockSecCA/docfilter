@@ -111,10 +111,13 @@ graph LR
 ## Features
 
 - **Multi-format Support**: PDF, DOCX, TXT, URLs, YouTube videos
-- **AI Analysis**: OpenAI, Anthropic, and local LLM support
+- **Browser Integration**: Send URLs directly from any browser with bookmarklet
+- **Smart Token Management**: Configurable limits with intelligent content truncation
+- **AI Analysis**: OpenAI, Anthropic, and local LLM support with visual status indicators
+- **Large Document Handling**: Process massive PDFs while preserving full content
 - **Local Storage**: All data stored locally (SQLite)
 - **Drag & Drop**: Easy file ingestion
-- **Configurable**: Customizable system prompts and providers
+- **Configurable**: Customizable system prompts, providers, and token limits
 
 ## Getting Started
 
@@ -157,10 +160,68 @@ Before using the app, configure your LLM providers:
 
 1. Click the "Config" button in the top-right
 2. Set your system prompt (instructions for the AI)
-3. Configure at least one provider:
+3. **Configure Token Limit**: Set max tokens based on your model:
+   - **GPT-3.5**: ~16,000 tokens
+   - **GPT-4**: ~128,000 tokens  
+   - **Claude**: ~200,000 tokens
+   - **Local LLMs**: Varies by model
+4. Configure at least one provider:
    - **OpenAI**: Add your API key (use `gpt-4o` for large documents)
    - **Anthropic**: Add your API key (use `claude-3-haiku-20240307` or newer)
    - **Local LLM**: Set endpoint (e.g., `http://localhost:11434/api/generate` for Ollama)
+
+## Browser Integration
+
+Send URLs directly from your browser to DocFilter:
+
+### Setup Bookmarklet
+
+1. **Copy this JavaScript code**:
+   ```javascript
+   javascript:(function(){window.open('docfilter://process?url=' + encodeURIComponent(window.location.href));})();
+   ```
+
+2. **Add to your browser**:
+   - Create a new bookmark
+   - Paste the code as the bookmark URL/location
+   - Name it "Send to DocFilter"
+
+### Usage
+
+1. Navigate to any webpage (great for arXiv papers!)
+2. Click your "Send to DocFilter" bookmark
+3. Browser prompts to open DocFilter (allow and remember choice)
+4. DocFilter automatically processes the page
+
+### What It Does
+
+- **PDF URLs**: Downloads and analyzes PDF files directly
+- **Web Pages**: Extracts main content from regular websites  
+- **URL Cleaning**: Removes tracking parameters automatically
+- **Single Window**: Uses existing DocFilter window if already open
+
+## Token Management
+
+DocFilter intelligently handles large content:
+
+### How It Works
+
+- **Token Estimation**: Estimates content size (~4 characters per token)
+- **Smart Truncation**: If content exceeds your token limit, it's truncated for AI analysis
+- **Full Preservation**: Complete extracted content is always saved regardless of truncation
+- **Visual Indicators**: Clear badges show when content was truncated
+
+### Status Indicators
+
+- **No badge**: AI analyzed the full content
+- **✂️ Truncated badge**: AI analyzed partial content (first ~80% of token limit)
+- **❌ Error badge**: Processing failed (content still preserved)
+
+### Upgrading Models
+
+- **Increase token limit** in config for better models
+- **Reprocess existing items** to analyze more content
+- **Truncation badges update** based on new limits
 
 ## Usage
 
@@ -168,6 +229,7 @@ Before using the app, configure your LLM providers:
    - Drag files into the drop zone
    - Click the drop zone to browse and select files
    - Enter URLs in the URL input field
+   - Use browser bookmarklet for one-click URL sending
 2. **AI Analysis**: The app extracts content and gets AI recommendations ("Read" or "Discard") with summary and reasoning
 3. **Review Results**: 
    - Browse the inbox with creation timestamps
@@ -250,8 +312,20 @@ Database includes:
 ## Troubleshooting
 
 ### Large Document Issues
-- Use GPT-4o instead of GPT-3.5-turbo for documents over ~8000 words
-- Context length errors indicate the model can't handle the content size
+- **Token Limit Too Low**: Increase max tokens in config for your model
+- **Still Getting Truncated**: Large documents may exceed even high token limits - this is normal
+- **Context Length Errors**: Your max token setting is higher than your model supports
+- **Reprocessing**: Use reprocess button after increasing token limits to analyze more content
+
+### Browser Integration Issues
+- **"No application found"**: Make sure DocFilter has been run at least once to register protocol
+- **Browser not prompting**: Check popup blockers or manually allow popups for the site
+- **Wrong URL sent**: Some sites use complex URLs - the bookmarklet sends the current page URL
+
+### Token Management
+- **Content Truncated**: Look for ✂️ badge - full content is always preserved below
+- **Want Full Analysis**: Increase token limit and reprocess, or use a more powerful model
+- **Error but Content Saved**: Check reasoning section for specific error details
 
 ### File Processing Issues  
 - Supported: PDF, DOCX, TXT, MD files
