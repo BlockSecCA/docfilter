@@ -130,6 +130,7 @@ export function registerIpcHandlers(): void {
         stmt.run('system_prompt', config.system_prompt);
         stmt.run('default_provider', config.default_provider);
         stmt.run('providers', JSON.stringify(config.providers));
+        stmt.run('max_tokens', config.max_tokens || '100000');
         
         stmt.finalize((err) => {
           if (err) {

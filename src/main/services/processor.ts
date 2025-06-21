@@ -2,6 +2,25 @@ import { extractContent } from './extractors';
 import { callLLM, LLMConfig } from './llm';
 import { getDatabase } from '../database/init';
 
+// Simple token estimation: ~4 characters per token for English text
+function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
+function truncateToTokenLimit(text: string, maxTokens: number): { content: string; wasTruncated: boolean } {
+  const estimatedTokens = estimateTokens(text);
+  
+  if (estimatedTokens <= maxTokens) {
+    return { content: text, wasTruncated: false };
+  }
+  
+  // Truncate to roughly fit token limit, leaving some buffer for system prompt
+  const targetChars = Math.floor(maxTokens * 4 * 0.8); // 80% of limit for safety
+  const truncated = text.substring(0, targetChars) + '\n\n[Content truncated due to length...]';
+  
+  return { content: truncated, wasTruncated: true };
+}
+
 export interface ProcessingResult {
   extractedContent: string;
   recommendation: string;
@@ -38,13 +57,25 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
   // Step 2: Get current configuration and analyze with LLM
   try {
     const config = await getCurrentConfig();
-    const llmResult = await callLLM(config.systemPrompt, extractedContent, config.llm);
+    
+    // Truncate content if it exceeds max tokens
+    const { content: contentForLLM, wasTruncated } = truncateToTokenLimit(extractedContent, config.maxTokens);
+    
+    console.log(`Content size: ${estimateTokens(extractedContent)} estimated tokens, max: ${config.maxTokens}, truncated: ${wasTruncated}`);
+    
+    const llmResult = await callLLM(config.systemPrompt, contentForLLM, config.llm);
+    
+    // Add note about truncation to reasoning if content was truncated
+    let reasoning = llmResult.reasoning;
+    if (wasTruncated) {
+      reasoning = `Note: Content was truncated to fit token limits (analyzed first ${Math.floor(config.maxTokens * 0.8)} tokens). Full content is preserved below.\n\n${reasoning}`;
+    }
     
     return {
-      extractedContent,
+      extractedContent, // Always return full extracted content
       recommendation: llmResult.recommendation,
       summary: llmResult.summary,
-      reasoning: llmResult.reasoning,
+      reasoning,
       provider: llmResult.provider,
       model: llmResult.model
     };
@@ -70,7 +101,7 @@ export async function processArtifact(input: ArtifactInput): Promise<ProcessingR
   }
 }
 
-async function getCurrentConfig(): Promise<{ systemPrompt: string; llm: LLMConfig }> {
+async function getCurrentConfig(): Promise<{ systemPrompt: string; llm: LLMConfig; maxTokens: number }> {
   const db = getDatabase();
   
   return new Promise((resolve, reject) => {
@@ -93,6 +124,7 @@ async function getCurrentConfig(): Promise<{ systemPrompt: string; llm: LLMConfi
       const provider = config.default_provider || 'openai';
       const providers = config.providers || {};
       const systemPrompt = config.system_prompt || 'Analyze this content and recommend "Read" or "Discard" with reasoning.';
+      const maxTokens = parseInt(config.max_tokens || '100000', 10);
       
       if (!providers[provider]) {
         throw new Error(`No configuration found for provider: ${provider}`);
@@ -105,7 +137,8 @@ async function getCurrentConfig(): Promise<{ systemPrompt: string; llm: LLMConfi
       
       resolve({
         systemPrompt,
-        llm: llmConfig
+        llm: llmConfig,
+        maxTokens
       });
     });
   });

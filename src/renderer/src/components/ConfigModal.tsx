@@ -8,6 +8,7 @@ interface ConfigModalProps {
 interface Config {
   system_prompt: string;
   default_provider: string;
+  max_tokens: string;
   providers: {
     openai?: { api_key: string; model?: string };
     anthropic?: { api_key: string; model?: string };
@@ -19,6 +20,7 @@ function ConfigModal({ onClose }: ConfigModalProps) {
   const [config, setConfig] = useState<Config>({
     system_prompt: '',
     default_provider: 'openai',
+    max_tokens: '100000',
     providers: {}
   });
   const [loading, setLoading] = useState(true);
@@ -68,6 +70,10 @@ function ConfigModal({ onClose }: ConfigModalProps) {
     setConfig(prev => ({ ...prev, default_provider: provider }));
   };
 
+  const updateMaxTokens = (maxTokens: string) => {
+    setConfig(prev => ({ ...prev, max_tokens: maxTokens }));
+  };
+
   if (loading) {
     return (
       <div className="modal-overlay">
@@ -107,6 +113,25 @@ function ConfigModal({ onClose }: ConfigModalProps) {
               <option value="anthropic">Anthropic</option>
               <option value="local">Local LLM</option>
             </select>
+          </div>
+
+          <div className="config-section">
+            <h3>Token Limit</h3>
+            <div className="input-group">
+              <label>Max Tokens:</label>
+              <input
+                type="number"
+                value={config.max_tokens}
+                onChange={(e) => updateMaxTokens(e.target.value)}
+                placeholder="100000"
+                min="1000"
+                max="1000000"
+              />
+              <small style={{display: 'block', marginTop: '5px', color: '#666'}}>
+                Maximum tokens to send to AI (content will be truncated if larger). 
+                Set based on your model's limits: GPT-3.5 (~16k), GPT-4 (~128k), Claude (~200k).
+              </small>
+            </div>
           </div>
 
           <div className="config-section">

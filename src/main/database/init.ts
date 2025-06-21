@@ -71,7 +71,8 @@ export async function initDatabase(): Promise<void> {
           INSERT OR IGNORE INTO config (key, value) VALUES 
           ('system_prompt', 'Analyze this content and provide a recommendation: "Read" if the content is valuable, informative, or relevant to the user''s interests, or "Discard" if it''s spam, low-quality, or irrelevant. Provide a brief reasoning for your decision.'),
           ('default_provider', 'openai'),
-          ('providers', '{}')
+          ('providers', '{}'),
+          ('max_tokens', '100000')
         `);
 
         resolve();
