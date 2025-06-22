@@ -288,7 +288,7 @@ CREATE TABLE config (
 
 ## Version History & Roadmap
 
-### Current Version: 1.7.0
+### Current Version: 1.7.1
 
 **Major Features Implemented:**
 - ✅ Multi-provider AI analysis (OpenAI, Anthropic, Local) 

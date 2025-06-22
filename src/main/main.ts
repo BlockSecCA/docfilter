@@ -46,6 +46,39 @@ function getChangelog(): string {
   // This ensures it's always available regardless of packaging
   const changelogContent = `# Changelog
 
+## [1.7.1] - 2025-06-22
+
+### Fixed
+- Critical PDF browser integration bug causing stack overflow and performance degradation
+- PDF extraction failing for arXiv URLs without .pdf extension (e.g., arxiv.org/pdf/1234567)
+- False "token limit exceeded" errors for small PDFs processed via browser integration
+- Raw PDF binary content being saved instead of extracted text for certain URL patterns
+- Enhanced PDF URL detection to handle arXiv, query parameters, and fragment patterns
+- Improved error handling with helpful troubleshooting guidance for PDF download failures
+
+### Enhanced
+- Added comprehensive debug logging visible in DevTools console for troubleshooting
+- Enhanced PDF processing reliability across all scenarios (upload, drag-drop, browser integration)
+- Added user warning in help documentation about PDF browser integration limitations
+- Improved buffer content detection to identify PDFs regardless of filename extension
+
+## [1.7.0] - 2025-06-21
+
+### Added
+- Browser integration with bookmarklet for sending URLs directly to DocFilter
+- Custom protocol handler (docfilter://) for seamless browser-to-app communication
+- Automatic PDF download and processing for PDF URLs from browser
+- URL tracking parameter removal (utm_source, fbclid, etc.) for cleaner processing
+- Single instance management to prevent multiple app windows
+- Configurable token limits with visual truncation status indicators
+- Enhanced error handling with content preservation during failures
+
+### Enhanced
+- Improved web content extraction with better main content detection
+- Cross-platform protocol handler registration
+- Event-based UI refresh system for real-time updates
+- Enhanced database schema with was_truncated field for better content management
+
 ## [1.6.0] - 2025-06-21
 
 ### Added
