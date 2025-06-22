@@ -280,7 +280,21 @@ function createMenu(): void {
                   <p>Before using the app, you need to set up an AI provider:</p>
                   <ol>
                     <li>Click the <strong>Config</strong> button in the top-right corner</li>
-                    <li>Write instructions for the AI in the <strong>System Prompt</strong> box (e.g., "You are helping me decide what content is worth reading. Focus on business and technology topics.")</li>
+                    <li><strong>Write System Prompt</strong>: This is critical for the app to work correctly. Your prompt MUST include:
+                      <ul>
+                        <li><strong>Required Keywords</strong>: Use the exact words "Read" and "Discard" in your instructions</li>
+                        <li><strong>Recommendation Request</strong>: Ask the AI to provide a recommendation between these two options</li>
+                        <li><strong>Reasoning Request</strong>: Ask for an explanation of the decision</li>
+                      </ul>
+                      <p><strong>✅ Good Example:</strong><br/>
+                      <code>"You are an expert content filter. Analyze content and recommend 'Read' if valuable or 'Discard' if not relevant. Provide reasoning for your decision."</code></p>
+                      <p><strong>❌ Bad Examples:</strong><br/>
+                      <code>"Rate this content 1-10"</code> (wrong format)<br/>
+                      <code>"Summarize this document"</code> (no recommendation)<br/>
+                      <code>"Answer yes or no"</code> (wrong keywords)</p>
+                      <p><strong>💡 Pro Tip:</strong> For best results, ask for this format:<br/>
+                      <code>SUMMARY: [brief summary]<br/>RECOMMENDATION: [Read or Discard]<br/>REASONING: [explanation]</code></p>
+                    </li>
                     <li><strong>Set Token Limit</strong>: Configure max tokens based on your model:
                       <ul>
                         <li><strong>GPT-3.5</strong>: ~16,000 tokens</li>
@@ -375,6 +389,8 @@ function createMenu(): void {
                   </ul>
                   
                   <h2>Troubleshooting</h2>
+                  <p><strong>All items show "Read" recommendations:</strong> Your system prompt may be missing required keywords. Make sure it includes "Read", "Discard", and asks for a recommendation. See the Configuration section above.</p>
+                  <p><strong>Strange or inconsistent recommendations:</strong> Check your system prompt format. The AI may not understand what you're asking for. Use the examples provided in the Configuration section.</p>
                   <p><strong>"Context length exceeded" errors:</strong> Try using GPT-4o instead of GPT-3.5-turbo for large documents</p>
                   <p><strong>Files won't process:</strong> Supported formats: PDF, Word (.docx), text files, markdown. Try uploading one file at a time.</p>
                   <p><strong>AI not responding:</strong> Check your API keys in the Config menu, verify your internet connection, and for local LLMs, ensure your server is running</p>
