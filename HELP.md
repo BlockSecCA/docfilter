@@ -10,7 +10,29 @@ DocFilter helps you quickly decide which documents, web pages, and videos are wo
 Before using the app, you need to set up an AI provider:
 
 1. Click the **Config** button (⚙️) in the top-right corner
-2. Write instructions for the AI in the **System Prompt** box (e.g., "You are helping me decide what content is worth reading. Focus on business and technology topics.")
+2. **Write System Prompt**: This is critical for the app to work correctly. Your prompt MUST include:
+   - **Required Keywords**: Use the exact words "Read" and "Discard" in your instructions
+   - **Recommendation Request**: Ask the AI to provide a recommendation between these two options
+   - **Reasoning Request**: Ask for an explanation of the decision
+   
+   **✅ Good Example:**
+   ```
+   "You are an expert content filter. Analyze content and recommend 'Read' if valuable or 'Discard' if not relevant. Provide reasoning for your decision."
+   ```
+   
+   **❌ Bad Examples:**
+   ```
+   "Rate this content 1-10" (wrong format)
+   "Summarize this document" (no recommendation)
+   "Answer yes or no" (wrong keywords)
+   ```
+   
+   **💡 Pro Tip:** For best results, ask for this format:
+   ```
+   SUMMARY: [brief summary]
+   RECOMMENDATION: [Read or Discard]
+   REASONING: [explanation]
+   ```
 3. **Set Token Limit**: Configure max tokens based on your model:
    - **GPT-3.5**: ~16,000 tokens
    - **GPT-4**: ~128,000 tokens
@@ -110,6 +132,16 @@ Your system prompt should clearly describe what you're looking for. Examples:
 - You can delete items individually or clear your database anytime
 
 ## Troubleshooting
+
+**All items show "Read" recommendations:**
+- Your system prompt may be missing required keywords
+- Make sure it includes "Read", "Discard", and asks for a recommendation
+- See the Configuration section above for examples
+
+**Strange or inconsistent recommendations:**
+- Check your system prompt format
+- The AI may not understand what you're asking for
+- Use the examples provided in the Configuration section
 
 **"Context length exceeded" errors:**
 - Try using GPT-4o instead of GPT-3.5-turbo for large documents
