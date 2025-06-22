@@ -9,6 +9,7 @@ This document outlines potential future enhancements for DocFilter. Items are or
 ## Near-Term Enhancements (v1.8-1.9)
 
 ### **User Experience Improvements**
+- [ ] **Guided System Prompt Builder** - Replace manual system prompt with "Areas of Interest" field that generates reliable, parser-compatible prompts automatically
 - [ ] **Dark Theme Support** - Modern dark mode UI theme
 - [ ] **Keyboard Navigation Shortcuts** - Power user keyboard shortcuts for common actions
 - [ ] **Advanced Filtering** - Filter by date ranges, providers, content types
