@@ -2,6 +2,28 @@
 
 All notable changes to DocFilter will be documented in this file.
 
+## [1.7.1] - 2025-06-22
+
+### Fixed
+- **Critical PDF Browser Integration Bug**: Fixed stack overflow and performance degradation when processing PDFs via browser bookmarklet
+- **arXiv PDF URLs**: Fixed PDF extraction failing for arXiv URLs without .pdf extension (e.g., `https://arxiv.org/pdf/1234567`)
+- **False Token Limit Errors**: Eliminated incorrect "token limit exceeded" errors for small PDFs processed via browser integration
+- **Raw Binary Content**: Fixed issue where raw PDF binary data was being saved instead of extracted text for certain URL patterns
+- **PDF URL Detection**: Enhanced detection to handle arXiv URLs, query parameters, and fragment patterns properly
+- **Download Error Handling**: Improved error handling with helpful troubleshooting guidance for PDF download failures
+
+### Enhanced
+- **Debug Logging**: Added comprehensive debug logging visible in DevTools console for easier troubleshooting
+- **PDF Processing Reliability**: Enhanced PDF processing to work consistently across all scenarios (upload, drag-drop, browser integration)
+- **User Documentation**: Added warning in help documentation about PDF browser integration limitations
+- **Buffer Content Detection**: Improved detection to identify PDFs regardless of filename extension using content analysis
+
+### Technical
+- Fixed file extension detection failing for URLs without explicit .pdf extensions
+- Enhanced buffer content validation to route PDFs correctly regardless of filename
+- Improved axios configuration with explicit size limits for large PDF downloads
+- Added comprehensive debugging throughout the extraction pipeline
+
 ## [1.7.0] - 2025-06-21
 
 ### Added
