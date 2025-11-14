@@ -5,7 +5,7 @@ Since you're in WSL2, here are the steps to run this on Windows:
 ## Option 1: Copy to Windows and run there
 1. Copy the entire project to your Windows file system:
    ```bash
-   cp -r /home/carlos/reading_agent /mnt/c/Users/YourUsername/Desktop/reading_agent
+   cp -r /home/your-username/reading_agent /mnt/c/Users/YourUsername/Desktop/reading_agent
    ```
 
 2. Open PowerShell/Command Prompt in Windows and navigate to the folder:
