@@ -1,5 +1,6 @@
 # <img src="assets/icon.png" alt="DocFilter Icon" width="64" height="64" style="vertical-align: middle;"> DocFilter
 
+[![Version](https://img.shields.io/badge/version-1.7.1-blue)](https://github.com/BlockSecCA/docfilter/releases) [![License](https://img.shields.io/github/license/BlockSecCA/docfilter)](https://github.com/BlockSecCA/docfilter/blob/main/LICENSE) [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Document Triage](https://img.shields.io/badge/AI-Document%20Triage-8A2BE2)](https://github.com/BlockSecCA/docfilter)
 
 > **⚠️ DISCLAIMER: This software is provided "AS IS" without warranty of any kind. This is a personal project shared for educational purposes. Issues, pull requests, and support requests will not be processed or responded to. Use at your own risk.**
 
